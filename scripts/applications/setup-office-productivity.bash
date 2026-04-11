@@ -89,5 +89,14 @@ else
     echo "✅ Notion is already installed. Skipping..."
 fi
 
+# Google Chrome
+# Note: Not available on App Store; installed via Homebrew Cask. https://www.google.com/chrome/
+if [ ! -d "/Applications/Google Chrome.app" ]; then
+    echo "Installing Google Chrome via Homebrew..."
+    brew install --cask google-chrome
+else
+    echo "✅ Google Chrome is already installed. Skipping..."
+fi
+
 
 echo "✅ Office setup script complete!"
