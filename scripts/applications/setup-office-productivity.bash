@@ -38,14 +38,28 @@ install_mas_app "409183694" "Keynote"
 
 # --- Proton Suite ---
 # Proton Mail
-install_mas_app "979659905" "Proton Mail"
+if [ ! -d "/Applications/Proton Mail.app" ]; then
+    echo "Installing Proton Mail via Homebrew..."
+    brew install --cask proton-mail
+else
+    echo "✅ Proton Mail is already installed. Skipping..."
+fi
 
 # Proton Pass
-install_mas_app "6443490629" "Proton Pass"
+if [ ! -d "/Applications/Proton Pass.app" ]; then
+    echo "Installing Proton Pass via Homebrew..."
+    brew install --cask proton-pass
+else
+    echo "✅ Proton Pass is already installed. Skipping..."
+fi
 
 # Proton VPN
-install_mas_app "1437005085" "Proton VPN"
-
+if [ ! -d "/Applications/Proton VPN.app" ]; then
+    echo "Installing Proton VPN via Homebrew..."
+    brew install --cask protonvpn
+else
+    echo "✅ Proton VPN is already installed. Skipping..."
+fi
 
 
 # 1Password8
