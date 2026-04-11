@@ -54,7 +54,7 @@ else
 fi
 
 # Automate Stats config
-if [ -f "./prefs/eu.exelban.Stats.plist" ]; then
+if [ -f "./configs/eu.exelban.Stats.plist" ]; then
     echo "⚙️  Restoring Stats preferences..."
     cp "./configs/eu.exelban.Stats.plist" "$HOME/Library/Preferences/"
     
