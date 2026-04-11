@@ -33,3 +33,14 @@ else
 fi
 
 echo "✅ Utilities setup complete!"
+
+# mas-cli
+# mas-cli (Mac App Store CLI) is a command-line interface for the Mac App Store.
+# It allows us to script the installation of official apps using their unique Store IDs.
+# Docs: https://github.com/mas-cli/mas
+if ! command -v mas &> /dev/null; then
+    echo "mas-cli not found. Installing via Homebrew..."
+    brew install mas
+else
+    echo "mas-cli is already installed. Skipping..."
+fi
