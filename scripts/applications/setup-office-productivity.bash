@@ -36,4 +36,19 @@ install_mas_app "409203825" "Numbers"
 # Apple Keynote
 install_mas_app "409183694" "Keynote"
 
+
+
+# Notion
+# Purpose: All-in-one workspace for notes, tasks, and project docs.
+# Docs: https://www.notion.so/desktop
+if [ ! -d "/Applications/Notion.app" ]; then
+    echo "Installing Notion via Homebrew..."
+    brew install --cask notion
+else
+    echo "✅ Notion is already installed. Skipping..."
+fi
+
+echo "✅ Office productivity setup complete!"
+
+
 echo "✅ Office setup script complete!"
