@@ -1,25 +1,31 @@
 #!/bin/bash
 
-# 1. Clear the Dock
+# Clear the Dock
+# Removes all default apps to start with a blank slate
 defaults write com.apple.dock persistent-apps -array ""
 
-# 2. Add System Settings
+# Add System Settings
 defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Settings.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
 
-# 3. Set static Dock size to smallest (16)
+# Add Microsoft Office Suite
+# Note: These must be installed via your setup-office.bash script first
+defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Microsoft Word.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
+defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Microsoft Excel.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
+defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Microsoft PowerPoint.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
+
+# Set static Dock size to smallest (24)
 defaults write com.apple.dock tilesize -int 24
 
-# 4. Enable Magnification
+# Enable Magnification
 defaults write com.apple.dock magnification -bool true
 
-# 5. Set Hover (Large) size to 'Medium' (roughly 48-64 range)
-# The slider in Settings goes up to 128; 48 is a nice middle ground.
+# Set Hover (Large) size to 64
 defaults write com.apple.dock largesize -int 64
 
-# 6. Disable 'Recents' for a cleaner look
+# Disable 'Recents' for a cleaner look
 defaults write com.apple.dock show-recents -bool false
 
-# 7. Restart Dock to apply everything
+# Restart Dock to apply everything
 killall Dock
 
-echo "Dock reset: Minimized size, medium magnification, Finder & Settings only."
+echo "Dock reset complete: Finder, System Settings, and MS Office Suite only."
