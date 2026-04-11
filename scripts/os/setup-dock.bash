@@ -1,16 +1,25 @@
 #!/bin/bash
 
-# 1. Clear everything out first
+# 1. Clear the Dock
 defaults write com.apple.dock persistent-apps -array ""
 
-# 2. Explicitly add System Settings
-# Note: Finder is handled by the OS, so we only need to add the Settings app path
+# 2. Add System Settings
 defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Settings.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
 
-# 3. Disable the 'Recents' section to ensure ONLY your two icons show
+# 3. Set static Dock size to smallest (16)
+defaults write com.apple.dock tilesize -int 16
+
+# 4. Enable Magnification
+defaults write com.apple.dock magnification -bool true
+
+# 5. Set Hover (Large) size to 'Medium' (roughly 48-64 range)
+# The slider in Settings goes up to 128; 48 is a nice middle ground.
+defaults write com.apple.dock largesize -int 48
+
+# 6. Disable 'Recents' for a cleaner look
 defaults write com.apple.dock show-recents -bool false
 
-# 4. Restart the Dock to apply
+# 7. Restart Dock to apply everything
 killall Dock
 
-echo "Done! Your Dock now only contains Finder and System Settings."
+echo "Dock reset: Minimized size, medium magnification, Finder & Settings only."
