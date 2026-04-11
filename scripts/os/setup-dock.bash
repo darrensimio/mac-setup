@@ -37,8 +37,8 @@ defaults write com.apple.dock tilesize -int 24
 # Enable Magnification
 defaults write com.apple.dock magnification -bool true
 
-# Set Hover (Large) size to 64
-defaults write com.apple.dock largesize -int 64
+# Set Hover (Large) size to 96
+defaults write com.apple.dock largesize -int 96
 
 # Disable 'Recents' for a cleaner look
 defaults write com.apple.dock show-recents -bool false
