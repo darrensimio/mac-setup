@@ -36,6 +36,8 @@ install_mas_app "409203825" "Numbers"
 # Apple Keynote
 install_mas_app "409183694" "Keynote"
 
+# 1Password8
+install_mas_app "1333542190" "1Password"
 
 
 # Notion
