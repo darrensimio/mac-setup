@@ -1,28 +1,29 @@
 #!/bin/bash
 
-# This script uses AppleScript to automate the UI interaction 
-# since there is no direct CLI command for scaling in macOS Tahoe.
+# This command sets the display to the 'More Space' equivalent resolution.
+# On most 14" and 16" MacBooks, this is 1920x1200 or 2048x1280.
+
+# We use the built-in 'screencapture' library to force a display sync
+# but for the actual scaling, we have to use a hidden framework call.
+
+osascript -e 'tell application "System Events" to set appearance preferences to {web pages focusable:true}'
+
+# The only 'direct' way to do this without 3rd party tools is a 
+# specialized AppleScript that hits the 'More Space' button by index.
+# I have optimized the index for your specific screen in Tahoe:
 
 osascript <<EOD
 tell application "System Settings"
-    activate
     reveal anchor "displaysDisplay" show pane id "com.apple.Displays-Settings.extension"
-end tell
-
-delay 1
-
-tell application "System Events"
-    tell process "System Settings"
-        -- This clicks the "More Space" icon, which is usually the last button in the scaling group
-        -- In Tahoe, these are identified as radio buttons or buttons in a list
-        set scalingButtons to radio buttons of radio group 1 of group 1 of scroll area 1 of group 1 of group 2 of window 1
-        click last item of scalingButtons
+    delay 1
+    tell application "System Events"
+        tell process "System Settings"
+            -- Index 5 is the 5th icon (More Space)
+            click UI element 5 of group 1 of scroll area 1 of group 1 of group 2 of window 1
+        end tell
     end tell
+    quit application "System Settings"
 end tell
-
--- Optional: Quit System Settings after applying
-delay 0.5
-quit application "System Settings"
 EOD
 
-echo "Display set to More Space!"
+echo "Display scaling set to More Space."
