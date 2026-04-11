@@ -7,14 +7,14 @@ defaults write com.apple.dock persistent-apps -array ""
 defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Settings.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
 
 # 3. Set static Dock size to smallest (16)
-defaults write com.apple.dock tilesize -int 16
+defaults write com.apple.dock tilesize -int 24
 
 # 4. Enable Magnification
 defaults write com.apple.dock magnification -bool true
 
 # 5. Set Hover (Large) size to 'Medium' (roughly 48-64 range)
 # The slider in Settings goes up to 128; 48 is a nice middle ground.
-defaults write com.apple.dock largesize -int 48
+defaults write com.apple.dock largesize -int 64
 
 # 6. Disable 'Recents' for a cleaner look
 defaults write com.apple.dock show-recents -bool false
