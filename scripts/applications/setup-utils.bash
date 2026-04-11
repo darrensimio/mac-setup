@@ -32,8 +32,6 @@ else
     echo "DisplayLink Manager is already installed. Skipping..."
 fi
 
-echo "✅ Utilities setup complete!"
-
 # mas-cli
 # mas-cli (Mac App Store CLI) is a command-line interface for the Mac App Store.
 # It allows us to script the installation of official apps using their unique Store IDs.
@@ -44,3 +42,9 @@ if ! command -v mas &> /dev/null; then
 else
     echo "mas-cli is already installed. Skipping..."
 fi
+
+
+
+
+
+echo "✅ Utilities setup complete!"
