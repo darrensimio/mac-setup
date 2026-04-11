@@ -111,5 +111,11 @@ fi
 # Slack
 install_mas_app "803453959" "Slack"
 
+# Whatsapp
+install_mas_app "310633997" "WhatsApp"
+
+# Telegram
+install_mas_app "747648890" "Telegram"
+
 
 echo "✅ Office setup script complete!"
