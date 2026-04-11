@@ -1,29 +1,31 @@
 #!/bin/bash
 
-# This command sets the display to the 'More Space' equivalent resolution.
-# On most 14" and 16" MacBooks, this is 1920x1200 or 2048x1280.
+# 1. Check if displayplacer is already installed
+if ! command -v displayplacer &> /dev/null; then
+    echo "displayplacer not found. Installing via Homebrew..."
+    brew install displayplacer
+else
+    echo "displayplacer is already installed. Skipping installation."
+fi
 
-# We use the built-in 'screencapture' library to force a display sync
-# but for the actual scaling, we have to use a hidden framework call.
+# 2. Configure the Dock (Finder + System Settings Only)
+echo "Configuring Dock icons..."
+defaults write com.apple.dock persistent-apps -array ""
+defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Settings.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
 
-osascript -e 'tell application "System Events" to set appearance preferences to {web pages focusable:true}'
+# 3. Set Dock Aesthetics
+echo "Setting Dock size and magnification..."
+defaults write com.apple.dock tilesize -int 16
+defaults write com.apple.dock magnification -bool true
+defaults write com.apple.dock largesize -int 48
+defaults write com.apple.dock show-recents -bool false
 
-# The only 'direct' way to do this without 3rd party tools is a 
-# specialized AppleScript that hits the 'More Space' button by index.
-# I have optimized the index for your specific screen in Tahoe:
+# 4. Restart Dock to apply changes
+killall Dock
 
-osascript <<EOD
-tell application "System Settings"
-    reveal anchor "displaysDisplay" show pane id "com.apple.Displays-Settings.extension"
-    delay 1
-    tell application "System Events"
-        tell process "System Settings"
-            -- Index 5 is the 5th icon (More Space)
-            click UI element 5 of group 1 of scroll area 1 of group 1 of group 2 of window 1
-        end tell
-    end tell
-    quit application "System Settings"
-end tell
-EOD
+# 5. Set Display to 'More Space'
+echo "Applying display scaling..."
+# On most MacBooks, 1920x1200 is the 'More Space' HiDPI toggle.
+displayplacer "res:1920x1200 scaling:on origin:(0,0) degree:0"
 
-echo "Display scaling set to More Space."
+echo "✅ Setup Complete!"
