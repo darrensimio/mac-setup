@@ -53,6 +53,16 @@ else
     echo "✅ Stats is already installed. Skipping..."
 fi
 
-
+# Automate Stats config
+if [ -f "./prefs/eu.exelban.Stats.plist" ]; then
+    echo "⚙️  Restoring Stats preferences..."
+    cp "./configs/eu.exelban.Stats.plist" "$HOME/Library/Preferences/"
+    
+    # Force macOS to reload the preferences from disk
+    defaults read eu.exelban.Stats > /dev/null
+    echo "✅ Stats preferences restored."
+else
+    echo "ℹ️  No Stats preference file found in ./prefs/. Skipping restore."
+fi
 
 echo "✅ Utilities setup complete!"
