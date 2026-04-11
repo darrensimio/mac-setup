@@ -48,7 +48,5 @@ else
     echo "✅ Notion is already installed. Skipping..."
 fi
 
-echo "✅ Office productivity setup complete!"
-
 
 echo "✅ Office setup script complete!"
