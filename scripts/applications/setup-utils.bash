@@ -43,7 +43,15 @@ else
     echo "mas-cli is already installed. Skipping..."
 fi
 
-
+# Stats
+# Purpose: Open-source system monitor for the menu bar (CPU, GPU, RAM, Network).
+# Docs: https://github.com/exelban/stats
+if ! command -v stats &> /dev/null && [ ! -d "/Applications/Stats.app" ]; then
+    echo "Installing Stats via Homebrew..."
+    brew install --cask stats
+else
+    echo "✅ Stats is already installed. Skipping..."
+fi
 
 
 
