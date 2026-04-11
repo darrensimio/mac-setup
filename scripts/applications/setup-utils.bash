@@ -18,6 +18,9 @@ fi
 if [ ! -d "/Applications/Hidden Bar.app" ]; then
     echo "Installing Hidden Bar via Homebrew..."
     brew install --cask hiddenbar
+
+    echo "🚀 Activating Hidden Bar..."
+    open -a "Hidden Bar"
 else
     echo "Hidden Bar is already installed. Skipping..."
 fi
