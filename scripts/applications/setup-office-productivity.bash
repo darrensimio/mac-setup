@@ -63,8 +63,12 @@ fi
 
 
 # 1Password8
-install_mas_app "1333542190" "1Password"
-
+if [ ! -d "/Applications/1Password.app" ]; then
+    echo "Installing 1Password via Homebrew..."
+    brew install --cask 1password
+else
+    echo "✅ 1Password is already installed. Skipping..."
+fi
 
 # Notion
 # Purpose: All-in-one workspace for notes, tasks, and project docs.
