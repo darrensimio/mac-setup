@@ -1,31 +1,31 @@
 #!/bin/bash
 
-# 1. Check if displayplacer is already installed
+# 1. Check for displayplacer
 if ! command -v displayplacer &> /dev/null; then
     echo "displayplacer not found. Installing via Homebrew..."
     brew install displayplacer
 else
-    echo "displayplacer is already installed. Skipping installation."
+    echo "displayplacer is already installed. Skipping..."
 fi
 
-# 2. Configure the Dock (Finder + System Settings Only)
-echo "Configuring Dock icons..."
-defaults write com.apple.dock persistent-apps -array ""
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Settings.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
+# 2. Identify Mac Model
+# This pulls the model identifier (e.g., MacBookPro18,3 or Mac14,5)
+MODEL_ID=$(sysctl -n hw.model)
+echo "Detected Hardware: $MODEL_ID"
 
-# 3. Set Dock Aesthetics
-echo "Setting Dock size and magnification..."
-defaults write com.apple.dock tilesize -int 16
-defaults write com.apple.dock magnification -bool true
-defaults write com.apple.dock largesize -int 48
-defaults write com.apple.dock show-recents -bool false
+# 3. Apply resolution based on hardware
+if [[ "$MODEL_ID" == *"MacBookAir"* ]] || [[ "$MODEL_ID" == *"Mac14,2"* ]] || [[ "$MODEL_ID" == *"Mac15,2"* ]]; then
+    # 13" MacBook Air scaling
+    echo "Setting 1710x1112 for MacBook Air..."
+    displayplacer "res:1710x1112 scaling:on origin:(0,0) degree:0"
+elif [[ "$MODEL_ID" == *"MacBookPro"* ]] || [[ "$MODEL_ID" == *"Mac14,5"* ]] || [[ "$MODEL_ID" == *"Mac14,9"* ]]; then
+    # 14" MacBook Pro scaling
+    echo "Setting 1800x1169 for MacBook Pro..."
+    displayplacer "res:1800x1169 scaling:on origin:(0,0) degree:0"
+else
+    # Fallback/Default for other models
+    echo "Unknown or different model. Attempting generic More Space (1920x1200)..."
+    displayplacer "res:1920x1200 scaling:on origin:(0,0) degree:0"
+fi
 
-# 4. Restart Dock to apply changes
-killall Dock
-
-# 5. Set Display to 'More Space'
-echo "Applying display scaling..."
-# On most MacBooks, 1920x1200 is the 'More Space' HiDPI toggle.
-displayplacer "res:1920x1200 scaling:on origin:(0,0) degree:0"
-
-echo "✅ Setup Complete!"
+echo "✅ Display scaling updated. Dock was not modified."
