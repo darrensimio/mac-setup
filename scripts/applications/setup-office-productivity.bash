@@ -26,6 +26,9 @@ install_mas_app "462062816" "Microsoft PowerPoint"
 # Windows App (Remote Desktop)
 install_mas_app "1295203466" "Windows App"
 
+# Microsoft Teams
+install_mas_app "1113153706" "Microsoft Teams"
+
 # Microsoft Edge
 # Note: Not available on Mac App Store; installed via Homebrew Cask., https://www.microsoft.com/en-us/edge/download
 if [ ! -d "/Applications/Microsoft Edge.app" ]; then
@@ -97,6 +100,16 @@ if [ ! -d "/Applications/Google Chrome.app" ]; then
 else
     echo "✅ Google Chrome is already installed. Skipping..."
 fi
+
+
+# Zoom
+if [ ! -d "/Applications/zoom.us.app" ]; then
+    echo "Installing Zoom via Homebrew..."
+    brew install --cask zoom
+fi
+
+# Slack
+install_mas_app "803453959" "Slack"
 
 
 echo "✅ Office setup script complete!"
