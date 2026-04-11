@@ -36,6 +36,18 @@ install_mas_app "409203825" "Numbers"
 # Apple Keynote
 install_mas_app "409183694" "Keynote"
 
+# --- Proton Suite ---
+# Proton Mail
+install_mas_app "979659905" "Proton Mail"
+
+# Proton Pass
+install_mas_app "6443490629" "Proton Pass"
+
+# Proton VPN
+install_mas_app "1437005085" "Proton VPN"
+
+
+
 # 1Password8
 install_mas_app "1333542190" "1Password"
 
