@@ -26,6 +26,15 @@ install_mas_app "462062816" "Microsoft PowerPoint"
 # Windows App (Remote Desktop)
 install_mas_app "1295203466" "Windows App"
 
+# Microsoft Edge
+# Note: Not available on Mac App Store; installed via Homebrew Cask., https://www.microsoft.com/en-us/edge/download
+if [ ! -d "/Applications/Microsoft Edge.app" ]; then
+    echo "Installing Microsoft Edge via Homebrew..."
+    brew install --cask microsoft-edge
+else
+    echo "✅ Microsoft Edge is already installed. Skipping..."
+fi
+
 # --- Apple Apps ---
 # Apple Pages
 install_mas_app "409201541" "Pages"
