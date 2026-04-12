@@ -19,7 +19,6 @@ if [ ! -d "/Applications/Spotify.app" ]; then
     brew install --cask spotify
     
     echo "🚀 Launching Spotify..."
-    open -a "Spotify"
 else
     echo "✅ Spotify is already installed. Skipping..."
 fi
