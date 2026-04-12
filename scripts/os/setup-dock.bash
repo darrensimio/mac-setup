@@ -22,6 +22,10 @@ defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</
 # Add System Settings
 defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Settings.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
 
+# Add Password Managers
+defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Proton Pass.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Proton Pass
+defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/1Password.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # 1Password
+
 # Add Windows App
 defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Windows App.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
 
