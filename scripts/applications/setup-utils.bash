@@ -2,6 +2,18 @@
 
 echo "⚙️  Setting up macOS Utilities..."
 
+# Spotify
+# Purpose: Music streaming service.
+# Docs: https://www.spotify.com/download/mac/
+if [ ! -d "/Applications/Spotify.app" ]; then
+    echo "Installing Spotify via Homebrew..."
+    brew install --cask spotify
+    
+    echo "🚀 Launching Spotify..."
+    open -a "Spotify"
+else
+    echo "✅ Spotify is already installed. Skipping..."
+fi
 
 # Alfred 5
 # Purpose: Productivity app for launching apps, searching the web, and automation.
