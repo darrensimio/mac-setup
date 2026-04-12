@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Function to install from App Store using mas
+install_mas_app() {
+    # $1 is the App ID, $2 is the Name
+    if ! mas list | grep -q "$1"; then
+        echo "Installing $2..."
+        mas install "$1"
+    else
+        echo "$2 is already installed. Skipping..."
+    fi
+}
+
 echo "⚙️  Setting up macOS Utilities..."
 
 # Moom Classic
