@@ -2,6 +2,15 @@
 
 echo "⚙️  Setting up macOS Utilities..."
 
+# Moom Classic
+# Purpose: Window management utility for moving and zooming windows.
+# ID: 419330170
+install_mas_app "419330170" "Moom Classic"
+if [ -d "/Applications/Moom Classic.app" ]; then
+    echo "🚀 Launching Moom Classic..."
+    open -a "Moom Classic"
+fi
+
 # Spotify
 # Purpose: Music streaming service.
 # Docs: https://www.spotify.com/download/mac/
