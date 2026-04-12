@@ -57,6 +57,12 @@ defaults write com.apple.dock largesize -int 96
 # Disable 'Recents' for a cleaner look
 defaults write com.apple.dock show-recents -bool false
 
+# Configure Hot Corners
+# Bottom Left (bl) -> Lock Screen (13)
+echo "⚙️  Configuring Hot Corner: Bottom-Left to Lock Screen..."
+defaults write com.apple.dock wgs-blcorner -int 13
+defaults write com.apple.dock wgs-blmodifier -int 0
+
 # Restart Dock to apply everything
 killall Dock
 
