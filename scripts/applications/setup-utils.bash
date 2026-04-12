@@ -16,6 +16,23 @@ else
     echo "✅ Alfred 5 is already installed. Skipping..."
 fi
 
+if [ -d "$ALFRED_PREFS" ]; then
+    echo "⚙️  Restoring Alfred 5 preferences..."
+
+    ALFRED_DIR="$HOME/Library/Application Support/Alfred"
+    ALFRED_PREFS="./configs/Alfred.alfredpreferences"
+    
+    # Ensure the Alfred directory exists
+    mkdir -p "$ALFRED_DIR"
+    
+    # Copy the preferences bundle
+    cp -R "$ALFRED_PREFS" "$ALFRED_DIR/"
+    
+    echo "✅ Alfred 5 preferences restored."
+else
+    echo "ℹ️  No Alfred preferences found in ./configs/. Skipping restore."
+fi
+
 # Caffeinated
 # Purpose: Prevents your Mac from sleeping or dimming.
 # Docs: https://macenities.com/caffeinated
