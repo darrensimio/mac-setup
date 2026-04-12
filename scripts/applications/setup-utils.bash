@@ -2,6 +2,20 @@
 
 echo "⚙️  Setting up macOS Utilities..."
 
+
+# Alfred 5
+# Purpose: Productivity app for launching apps, searching the web, and automation.
+# Docs: https://www.alfredapp.com/help/
+if [ ! -d "/Applications/Alfred 5.app" ]; then
+    echo "Installing Alfred 5 via Homebrew..."
+    brew install --cask alfred
+    
+    echo "🚀 Launching Alfred 5..."
+    open -a "Alfred 5"
+else
+    echo "✅ Alfred 5 is already installed. Skipping..."
+fi
+
 # Caffeinated
 # Purpose: Prevents your Mac from sleeping or dimming.
 # Docs: https://macenities.com/caffeinated
