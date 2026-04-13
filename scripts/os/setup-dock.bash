@@ -60,8 +60,10 @@ defaults write com.apple.dock show-recents -bool false
 # Configure Hot Corners
 # Bottom Left (bl) -> Lock Screen (13)
 echo "⚙️  Configuring Hot Corner: Bottom-Left to Lock Screen..."
-defaults write com.apple.dock wgs-blcorner -int 13
-defaults write com.apple.dock wgs-blmodifier -int 0
+# Set the Action
+defaults write com.apple.dock wvous-bl-corner -int 13
+# Set the Modifier (0 = None)
+defaults write com.apple.dock wvous-bl-modifier -int 0
 
 # Restart Dock to apply everything
 killall Dock
