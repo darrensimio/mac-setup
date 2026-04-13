@@ -76,6 +76,7 @@ defaults write com.apple.dock wvous-br-corner -int 13
 defaults write com.apple.dock wvous-br-modifier -int 0
 
 # Restart Dock to apply everything
+killall cfprefsd
 killall Dock
 
 echo "Dock reset complete: Finder, System Settings, and MS Office Suite only."
