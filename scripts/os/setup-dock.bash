@@ -65,12 +65,14 @@ echo "🔐 Setting lock screen timeout to: Immediately..."
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
-# Bottom Left
+# Set the Action
 defaults write com.apple.dock wvous-bl-corner -int 13
+# Set the Modifier (0 = None)
 defaults write com.apple.dock wvous-bl-modifier -int 0
 
-# Bottom Right
+# Set the Action
 defaults write com.apple.dock wvous-br-corner -int 13
+# Set the Modifier (0 = None)
 defaults write com.apple.dock wvous-br-modifier -int 0
 
 # Restart Dock to apply everything
