@@ -58,8 +58,13 @@ defaults write com.apple.dock largesize -int 96
 defaults write com.apple.dock show-recents -bool false
 
 # Configure Hot Corners
-# Bottom Left (bl) -> Lock Screen (13)
 echo "⚙️  Configuring Hot Corner: Bottom-Left to Lock Screen..."
+
+# Set screen to lock immediately after sleep or screen saver begins
+echo "🔐 Setting lock screen timeout to: Immediately..."
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
 # Set the Action
 defaults write com.apple.dock wvous-bl-corner -int 13
 # Set the Modifier (0 = None)
