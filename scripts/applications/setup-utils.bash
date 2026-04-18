@@ -143,3 +143,16 @@ if [ ! -d "/Applications/Jabra Direct.app" ]; then
 else
     echo "✅ Jabra Direct is already installed. Skipping..."
 fi
+
+# Logi Options+
+# Purpose: Customize Logitech mice, keyboards, and webcams.
+# Cask: logi-options+
+if [ ! -d "/Applications/Logi Options+.app" ]; then
+    echo "Installing Logi Options+ via Homebrew..."
+    brew install --cask logi-options+
+    
+    echo "🚀 Launching Logi Options+..."
+    open -a "Logi Options+"
+else
+    echo "✅ Logi Options+ is already installed. Skipping..."
+fi
