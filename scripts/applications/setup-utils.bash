@@ -131,3 +131,15 @@ else
 fi
 
 echo "✅ Utilities setup complete!"
+
+# Jabra Direct
+# Purpose: Optimize and personalize Jabra headset/speakerphone settings.
+if [ ! -d "/Applications/Jabra Direct.app" ]; then
+    echo "Installing Jabra Direct via Homebrew..."
+    brew install --cask jabra-direct
+    
+    echo "🚀 Launching Jabra Direct..."
+    open -a "Jabra Direct"
+else
+    echo "✅ Jabra Direct is already installed. Skipping..."
+fi
