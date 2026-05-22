@@ -416,3 +416,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# mac-setup local configs (keep README and .gitkeep)
+scripts/applications/configs/*
+!scripts/applications/configs/.gitkeep
+!scripts/applications/configs/README.md

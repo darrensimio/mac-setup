@@ -38,7 +38,12 @@ Supported on macOS Monterey or later on Apple Silicon, and on Intel Macs with Ap
 ## 4. Run mac-setup
 
 1. Clone the [mac-setup](../README.md) repository and install [prerequisites](../README.md#prerequisites) (**Homebrew**, **`mas`**, App Store sign-in).
-2. Run the scripts in [Quick start](../README.md#quick-start) from the repository root.
+2. From the repository root:
+
+   ```bash
+   bash scripts/setup.sh --check
+   bash scripts/setup.sh --include-dock
+   ```
 
 ---
 

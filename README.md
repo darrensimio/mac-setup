@@ -1,6 +1,6 @@
 # mac-setup
 
-Personal macOS setup scripts for installing apps and applying system preferences on a new Mac (or when re-applying your configuration). Scripts are idempotent and safe to re-run. Enterprise MDM or device management tooling is not included.
+Personal macOS setup scripts for installing apps and applying system preferences on a new Mac (or when re-applying your configuration). Application install scripts are idempotent and safe to re-run. Enterprise MDM or device management tooling is not included.
 
 **Wiping and reinstalling macOS?** See [docs/reformat-mac.md](docs/reformat-mac.md).
 
@@ -66,39 +66,53 @@ mas signin your@appleid.com   # optional; verify with: mas account
 ### Validate environment
 
 ```bash
-command -v xcode-select >/dev/null && echo "✔ Xcode CLI Tools"
-command -v brew >/dev/null && echo "✔ Homebrew"
-command -v mas >/dev/null && echo "✔ mas"
+bash scripts/setup.sh --check
+# or
+bash scripts/validate-env.bash
 ```
 
 ## Quick start
 
-Clone the repo, complete prerequisites above, then run scripts **from the repository root**. Install applications before configuring the Dock (the dock script expects apps under `/Applications`).
+Clone the repo, complete prerequisites above, then run from the **repository root**. Install applications before configuring the Dock (the dock script expects apps under `/Applications`).
 
 ```bash
 git clone <your-clone-url>
 cd mac-setup
 
-bash scripts/applications/setup-office-productivity.bash
-bash scripts/applications/setup-devtools.bash
-bash scripts/applications/setup-terminal.bash
-bash scripts/applications/setup-utils.bash
-bash scripts/os/setup-display.bash
-bash scripts/os/setup-dock.bash
-bash scripts/os/setup-widget.bash
+bash scripts/setup.sh --check
+bash scripts/setup.sh --include-dock   # fresh Mac: full run including Dock reset
 ```
 
-You can run scripts individually or in a different order; skip any you do not need.
+Re-run without resetting the Dock:
+
+```bash
+bash scripts/setup.sh --skip dock
+```
+
+Run individual steps:
+
+```bash
+bash scripts/setup.sh --apps-only
+bash scripts/setup.sh --os-only --include-dock
+bash scripts/setup.sh --dry-run
+```
+
+You can still run scripts under `scripts/applications/` and `scripts/os/` directly; skip any you do not need.
 
 ## Repository layout
 
 ```
 scripts/
+  setup.sh              # orchestrator (recommended entrypoint)
+  validate-env.bash     # prerequisite checks
+  lib/
+    common.bash         # shared install helpers
   applications/
     setup-office-productivity.bash
     setup-devtools.bash
     setup-terminal.bash
     setup-utils.bash
+    configs/            # local preference files (gitignored)
   os/
     setup-dock.bash
     setup-display.bash
@@ -107,7 +121,11 @@ scripts/
 
 ## Scripts
 
-Each script checks for existing installs and skips when already present.
+Application scripts check for existing installs and skip when already present.
+
+### `scripts/setup.sh`
+
+Runs application then OS scripts in order. **Dock reset is off by default** — pass `--include-dock` or set `MAC_SETUP_APPLY_DOCK=1` on a fresh Mac. See `bash scripts/setup.sh --help`.
 
 ### `scripts/applications/setup-office-productivity.bash`
 
@@ -145,17 +163,15 @@ Utilities and peripheral software.
 | Mac App Store (`mas`) | Moom Classic |
 | Homebrew cask | Spotify, Caffeinated, Hidden Bar, DisplayLink Manager, Stats, Jabra Direct, Logi Options+ |
 
-Also installs `mas` if not already on the system.
+Installs `mas` via Homebrew when missing (before App Store installs).
 
-**Optional preference restore** (if the file exists under `scripts/applications/configs/`):
+**Optional preference restore** — place files under `scripts/applications/configs/` (see [configs/README.md](scripts/applications/configs/README.md)):
 
-- `scripts/applications/configs/eu.exelban.Stats.plist` → `~/Library/Preferences/`
-
-These paths are not committed by default; add them locally if you want restore behavior.
+- `eu.exelban.Stats.plist` → `~/Library/Preferences/`
 
 ### `scripts/os/setup-dock.bash`
 
-Dock and related security settings via `defaults write` (not `dockutil`).
+Dock and related security settings via `defaults write` (not `dockutil`). **Resets the Dock every time it runs** — use via `setup.sh --include-dock` on a new Mac, or run directly when intentional.
 
 - Clears the dock, then adds: Safari, Google Chrome, Microsoft Edge, Spotify, Mail, Proton Mail, Messages, WhatsApp, Telegram, Microsoft Word/Excel/PowerPoint, App Store, System Settings, Proton Pass, 1Password, Windows App, iTerm, Visual Studio Code
 - Dock tile size 24, magnification on (large size 96), Recents hidden
@@ -179,4 +195,9 @@ Disables desktop widgets (`com.apple.WindowManager`, `com.apple.widgets`) and re
 
 ## Idempotency
 
-All scripts are designed to be non-destructive when re-run: existing apps and tools are detected and skipped rather than reinstalled.
+| Scripts | Re-run behavior |
+|---------|-----------------|
+| Application installs | Skip apps/tools already present |
+| `setup-display.bash`, `setup-widget.bash` | Re-apply settings (generally safe) |
+| `setup-dock.bash` | **Clears and rebuilds Dock** — use `--include-dock` only when you want that |
+
