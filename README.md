@@ -143,14 +143,13 @@ Utilities and peripheral software.
 | Source | Packages |
 |--------|----------|
 | Mac App Store (`mas`) | Moom Classic |
-| Homebrew cask | Spotify, Alfred 5, Caffeinated, Hidden Bar, DisplayLink Manager, Stats, Jabra Direct, Logi Options+ |
+| Homebrew cask | Spotify, Caffeinated, Hidden Bar, DisplayLink Manager, Stats, Jabra Direct, Logi Options+ |
 
 Also installs `mas` if not already on the system.
 
-**Optional preference restore** (if files exist under `./configs/`):
+**Optional preference restore** (if the file exists under `scripts/applications/configs/`):
 
-- `./configs/Alfred.alfredpreferences` → `~/Library/Application Support/Alfred/`
-- `./configs/eu.exelban.Stats.plist` → `~/Library/Preferences/`
+- `scripts/applications/configs/eu.exelban.Stats.plist` → `~/Library/Preferences/`
 
 These paths are not committed by default; add them locally if you want restore behavior.
 
