@@ -57,10 +57,43 @@ brew install mas
 mas signin your@appleid.com   # optional; verify with: mas account
 ```
 
+### Git and GitHub
+
+Required before you `git clone` this repository. Git is included with the Xcode Command Line Tools (verify with `git --version`).
+
+**1. Set your commit identity**
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+```
+
+**2. Authenticate with GitHub (SSH)**
+
+```bash
+# Generate a key (press Enter to accept defaults; add a passphrase if you want)
+ssh-keygen -t ed25519 -C "your@email.com" -f ~/.ssh/id_ed25519
+
+# Start the agent and add the key (macOS)
+eval "$(ssh-agent -s)"
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+
+# Copy the public key, then add it in GitHub → Settings → SSH and GPG keys → New SSH key
+pbcopy < ~/.ssh/id_ed25519.pub
+
+# Test the connection
+ssh -T git@github.com
+```
+
+Clone this repository:
+
+```bash
+git clone git@github.com:<your-user>/mac-setup.git
+```
+
 ### Optional
 
 - **Rosetta** (Apple Silicon, for Intel-only tools): `softwareupdate --install-rosetta --agree-to-license`
-- **Git identity** (if cloning this repo): `git config --global user.name` / `user.email`
 - **Full Disk Access** for Terminal or iTerm — some `defaults` changes may need it
 
 ### Validate environment
