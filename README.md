@@ -2,6 +2,8 @@
 
 Personal macOS setup scripts for installing apps and applying system preferences on a new Mac (or when re-applying your configuration). Scripts are idempotent and safe to re-run. Enterprise MDM or device management tooling is not included.
 
+**Wiping and reinstalling macOS?** See [docs/reformat-mac.md](docs/reformat-mac.md).
+
 ## Prerequisites
 
 - macOS 13 (Ventura) or newer
