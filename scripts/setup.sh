@@ -178,6 +178,11 @@ main() {
         bash "$SCRIPTS_DIR/validate-env.bash" || exit 1
     fi
 
+    if ! $DRY_RUN && ($RUN_APPS || $RUN_OS); then
+        mac_setup_acquire_sudo || exit 1
+        trap mac_setup_release_sudo EXIT
+    fi
+
     if $RUN_APPS; then
         log_step "Application installs"
         run_applications

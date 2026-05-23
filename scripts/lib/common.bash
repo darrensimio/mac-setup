@@ -119,3 +119,60 @@ restore_plist_if_present() {
     defaults read "$domain" >/dev/null 2>&1 || true
     echo "✅ Preferences restored from $src"
 }
+
+MAC_SETUP_SUDO_REFRESH_PID=""
+
+# Prompt for admin password once and keep credentials valid for the rest of the run.
+# Child scripts (separate bash processes) reuse the same cached sudo timestamp.
+mac_setup_acquire_sudo() {
+    if sudo -n true 2>/dev/null; then
+        return 0
+    fi
+    echo ""
+    echo "Administrator access is needed for some app installers (e.g. .pkg casks) and system tools."
+    echo "Enter your password once — it will stay valid for the rest of this setup run."
+    echo ""
+    if ! sudo -v; then
+        echo "Could not obtain administrator privileges."
+        return 1
+    fi
+    if [[ -n "${MAC_SETUP_SUDO_REFRESH_PID:-}" ]]; then
+        kill "$MAC_SETUP_SUDO_REFRESH_PID" 2>/dev/null || true
+    fi
+    (
+        while true; do
+            sleep 60
+            sudo -n true 2>/dev/null || exit
+        done
+    ) &
+    MAC_SETUP_SUDO_REFRESH_PID=$!
+    export MAC_SETUP_SUDO_READY=1
+    return 0
+}
+
+mac_setup_release_sudo() {
+    if [[ -n "${MAC_SETUP_SUDO_REFRESH_PID:-}" ]]; then
+        kill "$MAC_SETUP_SUDO_REFRESH_PID" 2>/dev/null || true
+        MAC_SETUP_SUDO_REFRESH_PID=""
+    fi
+}
+
+# Symlink VS Code CLI without sudo (user-local bin directory).
+mac_setup_link_vscode_cli() {
+    local vscode_bin="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+    local local_bin="$HOME/.local/bin"
+    if [[ ! -x "$vscode_bin" ]]; then
+        mac_setup_record_failure "VS Code CLI: binary not found"
+        return 1
+    fi
+    mkdir -p "$local_bin"
+    ln -sf "$vscode_bin" "$local_bin/code"
+    if [[ -f "$HOME/.zprofile" ]] && ! grep -qF '.local/bin' "$HOME/.zprofile" 2>/dev/null; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zprofile"
+        echo "Added ~/.local/bin to PATH in ~/.zprofile"
+    elif [[ ! -f "$HOME/.zprofile" ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zprofile"
+        echo "Created ~/.zprofile with ~/.local/bin on PATH"
+    fi
+    echo "✅ VS Code CLI available as: code (~/.local/bin/code)"
+}

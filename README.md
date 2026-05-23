@@ -210,6 +210,8 @@ Application scripts check for existing installs and skip when already present.
 
 Runs application then OS scripts in order. **Dock reset is off by default** — pass `--include-dock` or set `MAC_SETUP_APPLY_DOCK=1` on a fresh Mac.
 
+**Administrator password:** `setup.sh` asks for your Mac login password **once** at the start (when installing apps or OS settings), then keeps `sudo` credentials refreshed for the whole run. Some Homebrew casks (e.g. Microsoft Teams) use `.pkg` installers that need admin access; without this, macOS would prompt repeatedly.
+
 **Errors:** By default, a failed app install or failed script is logged and the run **continues** with the next package/script. The process exits with code `1` if anything failed. Use `--fail-fast` to stop on the first failure (previous behavior). See `bash scripts/setup.sh --help`.
 
 ### `scripts/applications/setup-office-productivity.bash`
@@ -230,7 +232,7 @@ Developer tools.
 
 | Source | Packages |
 |--------|----------|
-| Homebrew cask | Visual Studio Code (symlinks `code` to `/usr/local/bin/code`), Bruno |
+| Homebrew cask | Visual Studio Code (symlinks `code` to `~/.local/bin/code`), Bruno |
 | Homebrew formula | tig, gh, htop, curlie |
 
 ### `scripts/applications/setup-terminal.bash`
