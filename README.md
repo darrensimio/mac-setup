@@ -258,7 +258,7 @@ Utilities and peripheral software.
 | Source | Packages |
 |--------|----------|
 | Mac App Store (`mas`) | Moom Classic, Caffeinated (paid) |
-| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, Stats, Jabra Direct, Logi Options+ |
+| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, Stats |
 
 Installs `mas` via Homebrew when missing (before App Store installs).
 

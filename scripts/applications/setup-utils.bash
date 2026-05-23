@@ -44,12 +44,4 @@ fi
 
 restore_plist_if_present "eu.exelban.Stats.plist"
 
-if install_cask_if_missing "Jabra Direct.app" jabra-direct; then
-    open -a "Jabra Direct" 2>/dev/null || true
-fi
-
-if install_cask_if_missing "Logi Options+.app" logi-options+; then
-    open -a "Logi Options+" 2>/dev/null || true
-fi
-
 mac_setup_finish "Utilities setup"
