@@ -144,13 +144,16 @@ install_mas_app() {
         mac_setup_report "already" "$name"
         return 0
     fi
-    echo "Installing $name..."
-    if mas install "$id"; then
+    echo "Installing $name (App Store ID $id)..."
+    local mas_out mas_status
+    mas_out=$(mas install "$id" 2>&1) && mas_status=0 || mas_status=$?
+    if [[ $mas_status -eq 0 ]]; then
         mac_setup_report "installed" "$name"
         return 0
     fi
+    echo "$mas_out" >&2
     mac_setup_record_failure "App Store: $name"
-    mac_setup_report "failed" "$name" "mas install"
+    mac_setup_report "failed" "$name" "mas install ($id)"
     return 0
 }
 

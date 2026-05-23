@@ -227,7 +227,10 @@ Work and productivity apps.
 | Mac App Store (`mas`) | Microsoft Word, Excel, PowerPoint; Windows App; Pages, Numbers, Keynote; Slack; WhatsApp; Telegram |
 | Homebrew cask | Microsoft Teams, Microsoft Edge, Proton Mail, Proton Pass, Proton VPN, 1Password, Notion, Google Chrome, Zoom |
 
-Microsoft Teams is installed via Homebrew, not the Mac App Store: [App Store ID 1113153706](https://apps.apple.com/us/app/microsoft-teams/id1113153706) is the iOS/iPad app, so `mas install` cannot install the Mac desktop client.
+Microsoft Teams is installed via Homebrew
+
+iWork (Pages, Numbers, Keynote) use Mac App Store IDs in the `361…` series. Older `409…` IDs are not installable via `mas` on Mac. Latest listings require **macOS 15.6+**; on older macOS, install iWork manually from the App Store (it may offer a compatible older version).
+, not the Mac App Store: [App Store ID 1113153706](https://apps.apple.com/us/app/microsoft-teams/id1113153706) is the iOS/iPad app, so `mas install` cannot install the Mac desktop client.
 
 
 ### `scripts/applications/setup-devtools.bash`

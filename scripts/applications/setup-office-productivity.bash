@@ -17,9 +17,10 @@ install_cask_if_missing "Microsoft Teams.app" microsoft-teams
 
 install_cask_if_missing "Microsoft Edge.app" microsoft-edge
 
-install_mas_app "409201541" "Pages"
-install_mas_app "409203825" "Numbers"
-install_mas_app "409183694" "Keynote"
+# iWork — use current Mac App Store IDs (409…* IDs are legacy/iOS and fail with mas)
+install_mas_app "361309726" "Pages"
+install_mas_app "361304891" "Numbers"
+install_mas_app "361285480" "Keynote"
 
 install_cask_if_missing "Proton Mail.app" proton-mail
 install_cask_if_missing "Proton Pass.app" proton-pass
