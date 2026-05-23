@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Orchestrate mac-setup scripts in a safe, documented order.
-set -euo pipefail
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.bash
@@ -12,13 +12,18 @@ DRY_RUN=false
 RUN_APPS=true
 RUN_OS=true
 INCLUDE_DOCK=false
+FAIL_FAST=false
 SKIP_LIST=()
+SCRIPT_FAILURES=0
 
 usage() {
     cat <<EOF
 Usage: bash scripts/setup.sh [OPTIONS]
 
 Run mac-setup application and OS configuration scripts from the repo root.
+
+By default, install failures are logged and later steps still run. The process
+exits with code 1 if any step failed.
 
 Options:
   --check           Validate prerequisites only (same as validate-env.bash)
@@ -27,6 +32,7 @@ Options:
   --skip NAME       Skip a script group (repeatable):
                     office, devtools, terminal, utils, display, widget, dock
   --include-dock    Run setup-dock.bash (resets Dock layout; use on a fresh Mac)
+  --fail-fast       Stop on the first failed script (old behavior)
   --dry-run         Print scripts that would run without executing
   -h, --help        Show this help
 
@@ -36,7 +42,7 @@ Environment:
 Examples:
   bash scripts/setup.sh --check
   bash scripts/setup.sh --include-dock
-  bash scripts/setup.sh --apps-only
+  bash scripts/setup.sh --fail-fast
   bash scripts/setup.sh --skip office --skip dock
 
 Install Homebrew and Xcode CLI before running (see README.md).
@@ -75,6 +81,9 @@ parse_args() {
             --include-dock)
                 INCLUDE_DOCK=true
                 ;;
+            --fail-fast)
+                FAIL_FAST=true
+                ;;
             --dry-run)
                 DRY_RUN=true
                 ;;
@@ -103,7 +112,15 @@ run_script() {
         return 0
     fi
     log_step "Running $rel"
-    bash "$SCRIPTS_DIR/$rel"
+    if bash "$SCRIPTS_DIR/$rel"; then
+        return 0
+    fi
+    if $FAIL_FAST; then
+        echo "❌ $rel failed. Stopping (--fail-fast)."
+        exit 1
+    fi
+    echo "❌ $rel failed. Continuing with remaining steps."
+    SCRIPT_FAILURES=$((SCRIPT_FAILURES + 1))
 }
 
 run_applications() {
@@ -158,7 +175,7 @@ main() {
     if $DRY_RUN; then
         echo "[dry-run] bash $SCRIPTS_DIR/validate-env.bash"
     else
-        bash "$SCRIPTS_DIR/validate-env.bash"
+        bash "$SCRIPTS_DIR/validate-env.bash" || exit 1
     fi
 
     if $RUN_APPS; then
@@ -172,6 +189,10 @@ main() {
     fi
 
     echo ""
+    if (( SCRIPT_FAILURES > 0 )); then
+        echo "⚠️  mac-setup finished with $SCRIPT_FAILURES failed script(s)."
+        exit 1
+    fi
     echo "✅ mac-setup finished."
 }
 

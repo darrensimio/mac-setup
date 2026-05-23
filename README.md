@@ -208,7 +208,9 @@ Application scripts check for existing installs and skip when already present.
 
 ### `scripts/setup.sh`
 
-Runs application then OS scripts in order. **Dock reset is off by default** — pass `--include-dock` or set `MAC_SETUP_APPLY_DOCK=1` on a fresh Mac. See `bash scripts/setup.sh --help`.
+Runs application then OS scripts in order. **Dock reset is off by default** — pass `--include-dock` or set `MAC_SETUP_APPLY_DOCK=1` on a fresh Mac.
+
+**Errors:** By default, a failed app install or failed script is logged and the run **continues** with the next package/script. The process exits with code `1` if anything failed. Use `--fail-fast` to stop on the first failure (previous behavior). See `bash scripts/setup.sh --help`.
 
 ### `scripts/applications/setup-office-productivity.bash`
 
@@ -280,7 +282,9 @@ Disables desktop widgets (`com.apple.WindowManager`, `com.apple.widgets`) and re
 
 | Scripts | Re-run behavior |
 |---------|-----------------|
-| Application installs | Skip apps/tools already present |
+| Application installs | Skip apps/tools already present; failed installs are retried on the next run |
 | `setup-display.bash`, `setup-widget.bash` | Re-apply settings (generally safe) |
 | `setup-dock.bash` | **Clears and rebuilds Dock** — use `--include-dock` only when you want that |
+
+Failed `mas` or `brew` installs do not stop the rest of the run (unless you pass `--fail-fast` to `setup.sh`).
 

@@ -24,9 +24,38 @@ mac_setup_init_paths() {
     CONFIGS_DIR="$SCRIPTS_DIR/applications/configs"
 }
 
+MAC_SETUP_FAILURES=0
+
 log_step() {
     echo ""
     echo "==> $*"
+}
+
+mac_setup_record_failure() {
+    local label="$1"
+    echo "❌ Failed: $label"
+    MAC_SETUP_FAILURES=$((MAC_SETUP_FAILURES + 1))
+}
+
+# Run a command; on failure log and continue (do not exit the script).
+mac_setup_run() {
+    local label="$1"
+    shift
+    if "$@"; then
+        return 0
+    fi
+    mac_setup_record_failure "$label"
+    return 0
+}
+
+mac_setup_finish() {
+    local script_name="${1:-script}"
+    if (( MAC_SETUP_FAILURES > 0 )); then
+        echo ""
+        echo "⚠️  $script_name finished with $MAC_SETUP_FAILURES failure(s)."
+        exit 1
+    fi
+    echo "✅ $script_name complete!"
 }
 
 require_cmd() {
@@ -50,7 +79,7 @@ install_mas_app() {
         return 0
     fi
     echo "Installing $2..."
-    mas install "$1"
+    mac_setup_run "App Store: $2" mas install "$1"
 }
 
 # Returns 0 if a new install was performed, 1 if already present.
@@ -62,8 +91,11 @@ install_cask_if_missing() {
         return 1
     fi
     echo "Installing ${1%.app} via Homebrew..."
-    brew install --cask "$2"
-    return 0
+    if brew install --cask "$2"; then
+        return 0
+    fi
+    mac_setup_record_failure "Homebrew cask: ${1%.app}"
+    return 1
 }
 
 ensure_mas_installed() {
@@ -72,7 +104,7 @@ ensure_mas_installed() {
         return 0
     fi
     echo "mas-cli not found. Installing via Homebrew..."
-    brew install mas
+    mac_setup_run "Homebrew: mas" brew install mas
 }
 
 restore_plist_if_present() {
@@ -82,8 +114,7 @@ restore_plist_if_present() {
         echo "ℹ️  No $1 found in $CONFIGS_DIR. Skipping restore."
         return 0
     fi
-    echo "⚙️  Restoring $(basename "$1" .plist) preferences..."
-    cp "$src" "$HOME/Library/Preferences/"
+    mac_setup_run "Restore preferences: $1" cp "$src" "$HOME/Library/Preferences/"
     local domain="${1%.plist}"
     defaults read "$domain" >/dev/null 2>&1 || true
     echo "✅ Preferences restored from $src"
