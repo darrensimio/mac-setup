@@ -27,9 +27,15 @@ fi
 install_cask_if_missing "DisplayLink Manager.app" displaylink
 
 if ! command -v stats &>/dev/null && [[ ! -d "/Applications/Stats.app" ]]; then
-    mac_setup_run "Homebrew cask: Stats" brew install --cask stats
+    if brew install --cask stats; then
+        mac_setup_report "installed" "Stats"
+    else
+        mac_setup_record_failure "Homebrew cask: Stats"
+        mac_setup_report "failed" "Stats"
+    fi
 else
     echo "✅ Stats is already installed. Skipping..."
+    mac_setup_report "already" "Stats"
 fi
 
 restore_plist_if_present "eu.exelban.Stats.plist"

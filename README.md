@@ -212,7 +212,11 @@ Runs application then OS scripts in order. **Dock reset is off by default** — 
 
 **Administrator password:** `setup.sh` asks for your Mac login password **once** at the start (when installing apps or OS settings), then keeps `sudo` credentials refreshed for the whole run. Some Homebrew casks (e.g. Microsoft Teams) use `.pkg` installers that need admin access; without this, macOS would prompt repeatedly.
 
-**Errors:** By default, a failed app install or failed script is logged and the run **continues** with the next package/script. The process exits with code `1` if anything failed. Use `--fail-fast` to stop on the first failure (previous behavior). See `bash scripts/setup.sh --help`.
+**Errors:** By default, a failed app install or failed script is logged and the run **continues** with the next package/script. The process exits with code `1` if anything failed. Use `--fail-fast` to stop on the first failure (previous behavior).
+
+**Summary table:** At the end of a run, `setup.sh` prints a table of each app/tool and OS step with status (Installed, Already installed, Failed, Skipped, etc.). Results are also saved to `.mac-setup-last-run.tsv` in the repo root.
+
+See `bash scripts/setup.sh --help`.
 
 ### `scripts/applications/setup-office-productivity.bash`
 

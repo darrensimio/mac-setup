@@ -29,9 +29,15 @@ install_cask_if_missing "Notion.app" notion
 install_cask_if_missing "Google Chrome.app" google-chrome
 
 if [[ ! -d "/Applications/zoom.us.app" ]]; then
-    mac_setup_run "Homebrew cask: Zoom" brew install --cask zoom
+    if brew install --cask zoom; then
+        mac_setup_report "installed" "Zoom"
+    else
+        mac_setup_record_failure "Homebrew cask: Zoom"
+        mac_setup_report "failed" "Zoom"
+    fi
 else
     echo "✅ Zoom is already installed. Skipping..."
+    mac_setup_report "already" "Zoom"
 fi
 
 install_mas_app "803453959" "Slack"

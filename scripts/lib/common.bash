@@ -22,6 +22,25 @@ mac_setup_init_paths() {
     REPO_ROOT="$(mac_setup_repo_root)"
     SCRIPTS_DIR="$REPO_ROOT/scripts"
     CONFIGS_DIR="$SCRIPTS_DIR/applications/configs"
+    MAC_SETUP_REPORT_FILE="${MAC_SETUP_REPORT_FILE:-$REPO_ROOT/.mac-setup-last-run.tsv}"
+    export MAC_SETUP_REPORT_FILE
+}
+
+# Start a new report file (call once from setup.sh before child scripts).
+mac_setup_report_begin() {
+    mac_setup_init_paths
+    MAC_SETUP_REPORT_FILE="$REPO_ROOT/.mac-setup-last-run.tsv"
+    export MAC_SETUP_REPORT_FILE
+    : >"$MAC_SETUP_REPORT_FILE"
+}
+
+# status: installed | already | failed | skipped | completed
+mac_setup_report() {
+    local status="$1"
+    local item="$2"
+    local detail="${3:-}"
+    mac_setup_init_paths
+    printf '%s\t%s\t%s\n' "$status" "$item" "$detail" >>"$MAC_SETUP_REPORT_FILE"
 }
 
 MAC_SETUP_FAILURES=0
@@ -37,7 +56,6 @@ mac_setup_record_failure() {
     MAC_SETUP_FAILURES=$((MAC_SETUP_FAILURES + 1))
 }
 
-# Run a command; on failure log and continue (do not exit the script).
 mac_setup_run() {
     local label="$1"
     shift
@@ -45,16 +63,62 @@ mac_setup_run() {
         return 0
     fi
     mac_setup_record_failure "$label"
+    mac_setup_report "failed" "$label"
     return 0
+}
+
+mac_setup_print_summary() {
+    mac_setup_init_paths
+    if [[ ! -s "$MAC_SETUP_REPORT_FILE" ]]; then
+        echo ""
+        echo "No install results recorded."
+        return 0
+    fi
+
+    echo ""
+    echo "Setup summary"
+    echo ""
+    printf "| %-36s | %-22s |\n" "Item" "Status"
+    printf "| %-36s | %-22s |\n" "------------------------------------" "------------------------"
+
+    local status item detail label
+    while IFS=$'\t' read -r status item detail; do
+        case "$status" in
+            installed)  label="Installed" ;;
+            already)    label="Already installed" ;;
+            failed)     label="Failed" ;;
+            skipped)    label="Skipped" ;;
+            completed)  label="Completed" ;;
+            *)          label="$status" ;;
+        esac
+        if [[ -n "$detail" && "$status" == "failed" ]]; then
+            label="$label ($detail)"
+        fi
+        printf "| %-36s | %-22s |\n" "$item" "$label"
+    done <"$MAC_SETUP_REPORT_FILE"
+
+    local installed already failed skipped completed
+    installed=$(grep -c $'^installed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
+    already=$(grep -c $'^already\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
+    failed=$(grep -c $'^failed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
+    skipped=$(grep -c $'^skipped\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
+    completed=$(grep -c $'^completed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
+
+    echo ""
+    echo "Totals: $installed installed, $already already present, $completed completed, $failed failed, $skipped skipped"
 }
 
 mac_setup_finish() {
     local script_name="${1:-script}"
+    if [[ -z "${MAC_SETUP_ORCHESTRATED:-}" ]]; then
+        mac_setup_print_summary
+    fi
     if (( MAC_SETUP_FAILURES > 0 )); then
         echo ""
         echo "⚠️  $script_name finished with $MAC_SETUP_FAILURES failure(s)."
         exit 1
     fi
+    echo ""
     echo "✅ $script_name complete!"
 }
 
@@ -73,57 +137,98 @@ require_cmd() {
 }
 
 install_mas_app() {
-    # $1 App Store ID, $2 display name
-    if mas list 2>/dev/null | grep -qw "$1"; then
-        echo "✅ $2 is already installed. Skipping..."
+    local id="$1"
+    local name="$2"
+    if mas list 2>/dev/null | grep -qw "$id"; then
+        echo "✅ $name is already installed. Skipping..."
+        mac_setup_report "already" "$name"
         return 0
     fi
-    echo "Installing $2..."
-    mac_setup_run "App Store: $2" mas install "$1"
+    echo "Installing $name..."
+    if mas install "$id"; then
+        mac_setup_report "installed" "$name"
+        return 0
+    fi
+    mac_setup_record_failure "App Store: $name"
+    mac_setup_report "failed" "$name" "mas install"
+    return 0
 }
 
-# Returns 0 if a new install was performed, 1 if already present.
 install_cask_if_missing() {
-    # $1 app name under /Applications (e.g. "Spotify.app"), $2 brew cask name
-    local app_path="/Applications/$1"
+    local app_file="$1"
+    local cask="$2"
+    local name="${app_file%.app}"
+    local app_path="/Applications/$app_file"
     if [[ -d "$app_path" ]]; then
-        echo "✅ ${1%.app} is already installed. Skipping..."
+        echo "✅ $name is already installed. Skipping..."
+        mac_setup_report "already" "$name"
         return 1
     fi
-    echo "Installing ${1%.app} via Homebrew..."
-    if brew install --cask "$2"; then
+    echo "Installing $name via Homebrew..."
+    if brew install --cask "$cask"; then
+        mac_setup_report "installed" "$name"
         return 0
     fi
-    mac_setup_record_failure "Homebrew cask: ${1%.app}"
+    mac_setup_record_failure "Homebrew cask: $name"
+    mac_setup_report "failed" "$name" "brew install --cask $cask"
+    return 1
+}
+
+install_formula_if_missing() {
+    local pkg="$1"
+    if command -v "$pkg" &>/dev/null; then
+        echo "✅ $pkg is already installed. Skipping..."
+        mac_setup_report "already" "$pkg"
+        return 1
+    fi
+    echo "Installing $pkg via Homebrew..."
+    if brew install "$pkg"; then
+        mac_setup_report "installed" "$pkg"
+        return 0
+    fi
+    mac_setup_record_failure "Homebrew formula: $pkg"
+    mac_setup_report "failed" "$pkg" "brew install $pkg"
     return 1
 }
 
 ensure_mas_installed() {
     if command -v mas &>/dev/null; then
         echo "✅ mas-cli is already installed. Skipping..."
+        mac_setup_report "already" "mas-cli"
         return 0
     fi
     echo "mas-cli not found. Installing via Homebrew..."
-    mac_setup_run "Homebrew: mas" brew install mas
+    if brew install mas; then
+        mac_setup_report "installed" "mas-cli"
+        return 0
+    fi
+    mac_setup_record_failure "Homebrew: mas"
+    mac_setup_report "failed" "mas-cli" "brew install mas"
+    return 0
 }
 
 restore_plist_if_present() {
-    # $1 filename in CONFIGS_DIR (e.g. eu.exelban.Stats.plist)
-    local src="$CONFIGS_DIR/$1"
+    local file="$1"
+    local src="$CONFIGS_DIR/$file"
     if [[ ! -f "$src" ]]; then
-        echo "ℹ️  No $1 found in $CONFIGS_DIR. Skipping restore."
+        echo "ℹ️  No $file found in $CONFIGS_DIR. Skipping restore."
+        mac_setup_report "skipped" "Preferences: ${file%.plist}"
         return 0
     fi
-    mac_setup_run "Restore preferences: $1" cp "$src" "$HOME/Library/Preferences/"
-    local domain="${1%.plist}"
-    defaults read "$domain" >/dev/null 2>&1 || true
-    echo "✅ Preferences restored from $src"
+    if cp "$src" "$HOME/Library/Preferences/"; then
+        local domain="${file%.plist}"
+        defaults read "$domain" >/dev/null 2>&1 || true
+        echo "✅ Preferences restored from $src"
+        mac_setup_report "completed" "Preferences: ${file%.plist}"
+        return 0
+    fi
+    mac_setup_record_failure "Restore preferences: $file"
+    mac_setup_report "failed" "Preferences: ${file%.plist}"
+    return 0
 }
 
 MAC_SETUP_SUDO_REFRESH_PID=""
 
-# Prompt for admin password once and keep credentials valid for the rest of the run.
-# Child scripts (separate bash processes) reuse the same cached sudo timestamp.
 mac_setup_acquire_sudo() {
     if sudo -n true 2>/dev/null; then
         return 0
@@ -157,12 +262,12 @@ mac_setup_release_sudo() {
     fi
 }
 
-# Symlink VS Code CLI without sudo (user-local bin directory).
 mac_setup_link_vscode_cli() {
     local vscode_bin="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
     local local_bin="$HOME/.local/bin"
     if [[ ! -x "$vscode_bin" ]]; then
         mac_setup_record_failure "VS Code CLI: binary not found"
+        mac_setup_report "failed" "VS Code CLI (code command)"
         return 1
     fi
     mkdir -p "$local_bin"
@@ -175,4 +280,6 @@ mac_setup_link_vscode_cli() {
         echo "Created ~/.zprofile with ~/.local/bin on PATH"
     fi
     echo "✅ VS Code CLI available as: code (~/.local/bin/code)"
+    mac_setup_report "completed" "VS Code CLI (code command)"
+    return 0
 }

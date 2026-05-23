@@ -107,14 +107,17 @@ parse_args() {
 
 run_script() {
     local rel="$1"
+    local display_name="${2:-$rel}"
     if $DRY_RUN; then
         echo "[dry-run] bash $SCRIPTS_DIR/$rel"
         return 0
     fi
     log_step "Running $rel"
     if bash "$SCRIPTS_DIR/$rel"; then
+        mac_setup_report "completed" "$display_name"
         return 0
     fi
+    mac_setup_report "failed" "$display_name" "script error"
     if $FAIL_FAST; then
         echo "❌ $rel failed. Stopping (--fail-fast)."
         exit 1
@@ -125,42 +128,43 @@ run_script() {
 
 run_applications() {
     local scripts=(
-        "applications/setup-office-productivity.bash:office"
-        "applications/setup-devtools.bash:devtools"
-        "applications/setup-terminal.bash:terminal"
-        "applications/setup-utils.bash:utils"
+        "applications/setup-office-productivity.bash|office|Office productivity"
+        "applications/setup-devtools.bash|devtools|Developer tools"
+        "applications/setup-terminal.bash|terminal|Terminal environment"
+        "applications/setup-utils.bash|utils|Utilities"
     )
-    local entry rel skip_name
+    local entry rel skip_name display_name
     for entry in "${scripts[@]}"; do
-        rel="${entry%%:*}"
-        skip_name="${entry##*:}"
+        IFS='|' read -r rel skip_name display_name <<<"$entry"
         if should_skip "$skip_name"; then
             echo "Skipping $rel (--skip $skip_name)"
+            mac_setup_report "skipped" "$display_name"
             continue
         fi
-        run_script "$rel"
+        run_script "$rel" "$display_name"
     done
 }
 
 run_os() {
     local scripts=(
-        "os/setup-display.bash:display"
-        "os/setup-widget.bash:widget"
-        "os/setup-dock.bash:dock"
+        "os/setup-display.bash|display|Display scaling"
+        "os/setup-widget.bash|widget|Desktop widgets"
+        "os/setup-dock.bash|dock|Dock layout"
     )
-    local entry rel skip_name
+    local entry rel skip_name display_name
     for entry in "${scripts[@]}"; do
-        rel="${entry%%:*}"
-        skip_name="${entry##*:}"
+        IFS='|' read -r rel skip_name display_name <<<"$entry"
         if should_skip "$skip_name"; then
             echo "Skipping $rel (--skip $skip_name)"
+            mac_setup_report "skipped" "$display_name"
             continue
         fi
         if [[ "$skip_name" == "dock" ]] && ! $INCLUDE_DOCK; then
             echo "Skipping $rel (pass --include-dock or MAC_SETUP_APPLY_DOCK=1 to reset Dock)"
+            mac_setup_report "skipped" "$display_name"
             continue
         fi
-        run_script "$rel"
+        run_script "$rel" "$display_name"
     done
 }
 
@@ -179,6 +183,8 @@ main() {
     fi
 
     if ! $DRY_RUN && ($RUN_APPS || $RUN_OS); then
+        mac_setup_report_begin
+        export MAC_SETUP_ORCHESTRATED=1
         mac_setup_acquire_sudo || exit 1
         trap mac_setup_release_sudo EXIT
     fi
@@ -191,6 +197,10 @@ main() {
     if $RUN_OS; then
         log_step "OS configuration"
         run_os
+    fi
+
+    if ! $DRY_RUN && ($RUN_APPS || $RUN_OS); then
+        mac_setup_print_summary
     fi
 
     echo ""
