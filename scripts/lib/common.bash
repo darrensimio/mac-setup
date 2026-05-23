@@ -23,24 +23,43 @@ mac_setup_init_paths() {
     SCRIPTS_DIR="$REPO_ROOT/scripts"
     CONFIGS_DIR="$SCRIPTS_DIR/applications/configs"
     MAC_SETUP_REPORT_FILE="${MAC_SETUP_REPORT_FILE:-$REPO_ROOT/.mac-setup-last-run.tsv}"
-    export MAC_SETUP_REPORT_FILE
+    MAC_SETUP_ERRORS_FILE="${MAC_SETUP_ERRORS_FILE:-$REPO_ROOT/.mac-setup-last-run-errors.log}"
+    export MAC_SETUP_REPORT_FILE MAC_SETUP_ERRORS_FILE
 }
 
-# Start a new report file (call once from setup.sh before child scripts).
 mac_setup_report_begin() {
     mac_setup_init_paths
     MAC_SETUP_REPORT_FILE="$REPO_ROOT/.mac-setup-last-run.tsv"
-    export MAC_SETUP_REPORT_FILE
+    MAC_SETUP_ERRORS_FILE="$REPO_ROOT/.mac-setup-last-run-errors.log"
+    export MAC_SETUP_REPORT_FILE MAC_SETUP_ERRORS_FILE
     : >"$MAC_SETUP_REPORT_FILE"
+    : >"$MAC_SETUP_ERRORS_FILE"
 }
 
-# status: installed | already | failed | skipped | completed
 mac_setup_report() {
     local status="$1"
     local item="$2"
     local detail="${3:-}"
     mac_setup_init_paths
     printf '%s\t%s\t%s\n' "$status" "$item" "$detail" >>"$MAC_SETUP_REPORT_FILE"
+}
+
+mac_setup_report_failed() {
+    local item="$1"
+    local error_log="${2:-}"
+    local short="${3:-}"
+    mac_setup_init_paths
+    mac_setup_report "failed" "$item" "$short"
+    if [[ -n "$error_log" ]]; then
+        {
+            echo "### $item"
+            if [[ -n "$short" ]]; then
+                echo "Command: $short"
+            fi
+            echo "$error_log"
+            echo "---"
+        } >>"$MAC_SETUP_ERRORS_FILE"
+    fi
 }
 
 MAC_SETUP_FAILURES=0
@@ -59,11 +78,11 @@ mac_setup_record_failure() {
 mac_setup_run() {
     local label="$1"
     shift
-    if "$@"; then
-        return 0
-    fi
+    local out
+    out=$("$@" 2>&1) && return 0
+    echo "$out" >&2
     mac_setup_record_failure "$label"
-    mac_setup_report "failed" "$label"
+    mac_setup_report_failed "$label" "$out" "$*"
     return 0
 }
 
@@ -91,9 +110,6 @@ mac_setup_print_summary() {
             completed)  label="Completed" ;;
             *)          label="$status" ;;
         esac
-        if [[ -n "$detail" && "$status" == "failed" ]]; then
-            label="$label ($detail)"
-        fi
         printf "| %-36s | %-22s |\n" "$item" "$label"
     done <"$MAC_SETUP_REPORT_FILE"
 
@@ -106,6 +122,13 @@ mac_setup_print_summary() {
 
     echo ""
     echo "Totals: $installed installed, $already already present, $completed completed, $failed failed, $skipped skipped"
+
+    if [[ "${failed:-0}" -gt 0 && -s "$MAC_SETUP_ERRORS_FILE" ]]; then
+        echo ""
+        echo "Failure details"
+        echo ""
+        cat "$MAC_SETUP_ERRORS_FILE"
+    fi
 }
 
 mac_setup_finish() {
@@ -153,7 +176,7 @@ install_mas_app() {
     fi
     echo "$mas_out" >&2
     mac_setup_record_failure "App Store: $name"
-    mac_setup_report "failed" "$name" "mas install ($id)"
+    mac_setup_report_failed "$name" "$mas_out" "mas install $id"
     return 0
 }
 
@@ -168,12 +191,15 @@ install_cask_if_missing() {
         return 1
     fi
     echo "Installing $name via Homebrew..."
-    if brew install --cask "$cask"; then
+    local brew_out brew_status
+    brew_out=$(brew install --cask "$cask" 2>&1) && brew_status=0 || brew_status=$?
+    if [[ $brew_status -eq 0 ]]; then
         mac_setup_report "installed" "$name"
         return 0
     fi
+    echo "$brew_out" >&2
     mac_setup_record_failure "Homebrew cask: $name"
-    mac_setup_report "failed" "$name" "brew install --cask $cask"
+    mac_setup_report_failed "$name" "$brew_out" "brew install --cask $cask"
     return 1
 }
 
@@ -185,12 +211,15 @@ install_formula_if_missing() {
         return 1
     fi
     echo "Installing $pkg via Homebrew..."
-    if brew install "$pkg"; then
+    local brew_out brew_status
+    brew_out=$(brew install "$pkg" 2>&1) && brew_status=0 || brew_status=$?
+    if [[ $brew_status -eq 0 ]]; then
         mac_setup_report "installed" "$pkg"
         return 0
     fi
+    echo "$brew_out" >&2
     mac_setup_record_failure "Homebrew formula: $pkg"
-    mac_setup_report "failed" "$pkg" "brew install $pkg"
+    mac_setup_report_failed "$pkg" "$brew_out" "brew install $pkg"
     return 1
 }
 
@@ -201,12 +230,15 @@ ensure_mas_installed() {
         return 0
     fi
     echo "mas-cli not found. Installing via Homebrew..."
-    if brew install mas; then
+    local brew_out brew_status
+    brew_out=$(brew install mas 2>&1) && brew_status=0 || brew_status=$?
+    if [[ $brew_status -eq 0 ]]; then
         mac_setup_report "installed" "mas-cli"
         return 0
     fi
+    echo "$brew_out" >&2
     mac_setup_record_failure "Homebrew: mas"
-    mac_setup_report "failed" "mas-cli" "brew install mas"
+    mac_setup_report_failed "mas-cli" "$brew_out" "brew install mas"
     return 0
 }
 
@@ -226,7 +258,7 @@ restore_plist_if_present() {
         return 0
     fi
     mac_setup_record_failure "Restore preferences: $file"
-    mac_setup_report "failed" "Preferences: ${file%.plist}"
+    mac_setup_report_failed "Preferences: ${file%.plist}" "cp failed for $src" "cp $src ~/Library/Preferences/"
     return 0
 }
 
@@ -270,7 +302,7 @@ mac_setup_link_vscode_cli() {
     local local_bin="$HOME/.local/bin"
     if [[ ! -x "$vscode_bin" ]]; then
         mac_setup_record_failure "VS Code CLI: binary not found"
-        mac_setup_report "failed" "VS Code CLI (code command)"
+        mac_setup_report_failed "VS Code CLI (code command)" "VS Code binary not found at $vscode_bin"
         return 1
     fi
     mkdir -p "$local_bin"

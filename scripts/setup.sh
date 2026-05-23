@@ -113,11 +113,14 @@ run_script() {
         return 0
     fi
     log_step "Running $rel"
-    if bash "$SCRIPTS_DIR/$rel"; then
+    local script_out script_status
+    script_out=$(bash "$SCRIPTS_DIR/$rel" 2>&1) && script_status=0 || script_status=$?
+    if [[ $script_status -eq 0 ]]; then
         mac_setup_report "completed" "$display_name"
         return 0
     fi
-    mac_setup_report "failed" "$display_name" "script error"
+    echo "$script_out" >&2
+    mac_setup_report_failed "$display_name" "$script_out" "bash $SCRIPTS_DIR/$rel"
     if $FAIL_FAST; then
         echo "❌ $rel failed. Stopping (--fail-fast)."
         exit 1

@@ -422,3 +422,4 @@ scripts/applications/configs/*
 !scripts/applications/configs/.gitkeep
 !scripts/applications/configs/README.md
 .mac-setup-last-run.tsv
+.mac-setup-last-run-errors.log

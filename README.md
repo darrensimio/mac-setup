@@ -214,7 +214,7 @@ Runs application then OS scripts in order. **Dock reset is off by default** — 
 
 **Errors:** By default, a failed app install or failed script is logged and the run **continues** with the next package/script. The process exits with code `1` if anything failed. Use `--fail-fast` to stop on the first failure (previous behavior).
 
-**Summary table:** At the end of a run, `setup.sh` prints a table of each app/tool and OS step with status (Installed, Already installed, Failed, Skipped, etc.). Results are also saved to `.mac-setup-last-run.tsv` in the repo root.
+**Summary table:** At the end of a run, `setup.sh` prints a table of each app/tool and OS step with status (Installed, Already installed, Failed, Skipped, etc.). Failed items are followed by a **Failure details** section with the full command output. Results are saved to `.mac-setup-last-run.tsv` and `.mac-setup-last-run-errors.log` in the repo root.
 
 See `bash scripts/setup.sh --help`.
 
