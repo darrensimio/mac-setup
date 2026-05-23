@@ -21,10 +21,77 @@ sw_vers
 
 ### Install Xcode Command Line Tools
 
+Homebrew and Git depend on Apple’s **Command Line Tools** (CLT). Check whether they are already installed:
+
+```bash
+xcode-select -p
+git --version
+```
+
+If `xcode-select -p` prints `/Library/Developer/CommandLineTools` (or a path under `/Applications/Xcode.app/...`) and `git --version` works, skip to [Install Homebrew](#install-homebrew).
+
+#### Method 1 — GUI installer (simplest on a Mac with a screen)
+
+Run in **Terminal.app** or **iTerm** (not only inside an IDE terminal — the system dialog may not appear otherwise):
+
 ```bash
 xcode-select --install
-xcode-select -p   # expect /Library/Developer/CommandLineTools
 ```
+
+1. Wait for the dialog **“The xcode-select command requires the command line developer tools”**.
+2. Click **Install** (not **Get Xcode** unless you want the full Xcode app).
+3. Accept the license and wait for the download to finish (can take several minutes).
+4. Verify:
+
+```bash
+xcode-select -p
+# Expected: /Library/Developer/CommandLineTools
+
+git --version
+clang --version
+```
+
+If you see **“Can't install the software because it is not currently available”** or no dialog appears, use Method 2.
+
+#### Method 2 — Command line only (no GUI)
+
+Uses `softwareupdate`, the same mechanism Homebrew relies on when CLT are missing. Requires admin password.
+
+```bash
+touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+
+LABEL=$(softwareupdate --list 2>/dev/null \
+  | grep -E '\*.*Command Line Tools' \
+  | tail -n 1 \
+  | sed 's/^[[:space:]]*\*[[:space:]]*//')
+
+if [[ -z "$LABEL" ]]; then
+  echo "No Command Line Tools label found. Try Method 1 or install from System Settings → General → Software Update."
+  rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+  exit 1
+fi
+
+echo "Installing: $LABEL"
+sudo softwareupdate --install "$LABEL" --verbose
+
+rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+
+sudo xcode-select --switch /Library/Developer/CommandLineTools
+xcode-select -p
+```
+
+#### Troubleshooting
+
+| Symptom | What to try |
+|--------|-------------|
+| Dialog never appears | Use Method 2, or **System Settings → General → Software Update** and install “Command Line Tools for Xcode”. |
+| `xcode-select: error: unable to get active developer directory` | CLT not installed yet — complete Method 1 or 2. |
+| Tools installed but wrong path | `sudo xcode-select --switch /Library/Developer/CommandLineTools` |
+| Stuck or corrupted install | Remove and reinstall: `sudo rm -rf /Library/Developer/CommandLineTools` then run Method 1 or 2 again. |
+| `xcode-select --install` says already installed but `git` fails | Run Method 2 or Software Update; then `xcode-select -p` again. |
+| After a major macOS upgrade | Open Software Update — Apple often ships a new CLT package for the new OS. |
+
+You do **not** need the full Xcode app from the App Store unless you develop with Xcode itself. CLT alone are enough for this repo.
 
 ### Install Homebrew
 
