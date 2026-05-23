@@ -11,7 +11,9 @@ install_mas_app "462054704" "Microsoft Word"
 install_mas_app "462058435" "Microsoft Excel"
 install_mas_app "462062816" "Microsoft PowerPoint"
 install_mas_app "1295203466" "Windows App"
-install_mas_app "1113153706" "Microsoft Teams"
+
+# Teams: App Store ID 1113153706 is iOS/iPad only — desktop Teams is via Homebrew
+install_cask_if_missing "Microsoft Teams.app" microsoft-teams
 
 install_cask_if_missing "Microsoft Edge.app" microsoft-edge
 

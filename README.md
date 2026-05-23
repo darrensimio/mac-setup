@@ -218,8 +218,11 @@ Work and productivity apps.
 
 | Source | Packages |
 |--------|----------|
-| Mac App Store (`mas`) | Microsoft Word, Excel, PowerPoint, Teams; Windows App; Pages, Numbers, Keynote; Slack; WhatsApp; Telegram |
-| Homebrew cask | Microsoft Edge, Proton Mail, Proton Pass, Proton VPN, 1Password, Notion, Google Chrome, Zoom |
+| Mac App Store (`mas`) | Microsoft Word, Excel, PowerPoint; Windows App; Pages, Numbers, Keynote; Slack; WhatsApp; Telegram |
+| Homebrew cask | Microsoft Teams, Microsoft Edge, Proton Mail, Proton Pass, Proton VPN, 1Password, Notion, Google Chrome, Zoom |
+
+Microsoft Teams is installed via Homebrew, not the Mac App Store: [App Store ID 1113153706](https://apps.apple.com/us/app/microsoft-teams/id1113153706) is the iOS/iPad app, so `mas install` cannot install the Mac desktop client.
+
 
 ### `scripts/applications/setup-devtools.bash`
 
