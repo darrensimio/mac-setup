@@ -257,10 +257,12 @@ Utilities and peripheral software.
 
 | Source | Packages |
 |--------|----------|
-| Mac App Store (`mas`) | Moom Classic |
-| Homebrew cask | Spotify, Caffeinated, Hidden Bar, DisplayLink Manager, Stats, Jabra Direct, Logi Options+ |
+| Mac App Store (`mas`) | Moom Classic, Caffeinated (paid) |
+| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, Stats, Jabra Direct, Logi Options+ |
 
 Installs `mas` via Homebrew when missing (before App Store installs).
+
+**Caffeinated** uses Mac App Store ID `1362171212` (the Homebrew cask `caffeinated` was removed). It is a paid app — sign in to the App Store and get it on your Apple ID once before `mas install` will work.
 
 **Optional preference restore** — place files under `scripts/applications/configs/` (see [configs/README.md](scripts/applications/configs/README.md)):
 

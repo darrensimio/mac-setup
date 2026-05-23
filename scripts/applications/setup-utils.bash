@@ -18,7 +18,8 @@ if install_cask_if_missing "Spotify.app" spotify; then
     open -a Spotify 2>/dev/null || true
 fi
 
-install_cask_if_missing "Caffeinated.app" caffeinated
+# Caffeinated — Homebrew cask removed; install from Mac App Store (paid app)
+install_mas_app "1362171212" "Caffeinated"
 
 if install_cask_if_missing "Hidden Bar.app" hiddenbar; then
     open -a "Hidden Bar" 2>/dev/null || true
