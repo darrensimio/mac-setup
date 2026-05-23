@@ -239,7 +239,7 @@ Developer tools.
 
 | Source | Packages |
 |--------|----------|
-| Homebrew cask | Visual Studio Code (symlinks `code` to `~/.local/bin/code`), Bruno |
+| Homebrew cask | Visual Studio Code (symlinks `code` to `~/.local/bin/code`), Cursor, Bruno |
 | Homebrew formula | tig, gh, htop, curlie |
 
 ### `scripts/applications/setup-terminal.bash`

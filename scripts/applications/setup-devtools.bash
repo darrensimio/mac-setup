@@ -13,6 +13,8 @@ elif [[ -x "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code
     mac_setup_link_vscode_cli || true
 fi
 
+install_cask_if_missing "Cursor.app" cursor
+
 install_cask_if_missing "Bruno.app" bruno
 
 for pkg in tig gh htop curlie; do
