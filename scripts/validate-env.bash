@@ -50,10 +50,10 @@ fi
 warn "mas (Mac App Store CLI)" command -v mas &>/dev/null
 
 if command -v mas &>/dev/null; then
-    if mas account &>/dev/null; then
-        echo "✔ mas App Store sign-in"
+    if mas search test &>/dev/null; then
+        echo "✔ mas App Store access"
     else
-        echo "⚠ mas App Store sign-in (run: mas signin your@appleid.com)"
+        echo "⚠ mas App Store sign-in (sign in via the App Store app — mas signin is not available)"
         WARN=1
     fi
 fi

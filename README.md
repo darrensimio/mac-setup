@@ -92,8 +92,20 @@ Required before running scripts that install App Store apps:
 
 ```bash
 brew install mas
-mas signin your@appleid.com   # optional; verify with: mas account
 ```
+
+**Sign in to the Mac App Store in the GUI** — there is no working `mas signin` on current macOS. Apple removed the API years ago; recent `mas` releases also dropped the `signin` and `account` commands.
+
+1. Open the **App Store** app (or **System Settings → Apple ID → Media & Purchases**).
+2. Sign in with the Apple ID you use for Mac App Store downloads.
+3. Confirm `mas` works:
+
+```bash
+mas version
+mas search slack   # should return results, not an auth error
+```
+
+If `mas install` fails with a sign-in or account error, sign out and back in via the App Store app, then retry.
 
 ### Git and GitHub
 
