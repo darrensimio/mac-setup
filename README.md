@@ -272,7 +272,7 @@ Installs `mas` via Homebrew when missing (before App Store installs).
 
 Dock and related security settings via `defaults write` (not `dockutil`). **Resets the Dock every time it runs** — use via `setup.sh --include-dock` on a new Mac, or run directly when intentional.
 
-- Clears the dock, then adds: Safari, Google Chrome, Microsoft Edge, Spotify, Mail, Proton Mail, Messages, WhatsApp, Telegram, Microsoft Word/Excel/PowerPoint, App Store, System Settings, Proton Pass, 1Password, Windows App, iTerm, Visual Studio Code
+- Clears the dock, then adds: Safari, Google Chrome, Microsoft Edge, Spotify, Mail, Proton Mail, Messages, WhatsApp, Telegram, Notion, Microsoft Word/Excel/PowerPoint, App Store, System Settings, Proton Pass, 1Password, Windows App, iTerm, Visual Studio Code
 - Dock tile size 24, magnification on (large size 96), Recents hidden
 - Bottom-left and bottom-right hot corners: lock screen
 - Require password immediately after sleep or screen saver
