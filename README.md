@@ -161,10 +161,24 @@ Clone the repo, complete prerequisites above, then run from the **repository roo
 ```bash
 git clone <your-clone-url>
 cd mac-setup
+```
 
+Check prerequisites:
+
+```bash
 bash scripts/setup.sh --check
-bash scripts/setup.sh --include-dock   # fresh Mac: full run including Dock reset
-bash scripts/setup.sh --dock-check     # check current Dock against desired (no changes)
+```
+
+Fresh Mac (full run including Dock reset):
+
+```bash
+bash scripts/setup.sh --include-dock
+```
+
+Check current Dock vs desired (no changes):
+
+```bash
+bash scripts/setup.sh --dock-check
 ```
 
 Re-run without resetting the Dock:
