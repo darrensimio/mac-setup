@@ -43,6 +43,7 @@ Supported on macOS Monterey or later on Apple Silicon, and on Intel Macs with Ap
    ```bash
    bash scripts/setup.sh --check
    bash scripts/setup.sh --include-dock
+   bash scripts/setup.sh --dock-check
    ```
 
 ---

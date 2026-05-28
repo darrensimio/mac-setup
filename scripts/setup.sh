@@ -12,6 +12,7 @@ DRY_RUN=false
 RUN_APPS=true
 RUN_OS=true
 INCLUDE_DOCK=false
+DOCK_CHECK=false
 FAIL_FAST=false
 SKIP_LIST=()
 SCRIPT_FAILURES=0
@@ -31,6 +32,7 @@ Options:
   --os-only         Run OS configuration scripts only
   --skip NAME       Skip a script group (repeatable):
                     office, devtools, terminal, utils, display, widget, dock
+  --dock-check      Check current Dock apps/order vs desired (no changes)
   --include-dock    Run setup-dock.bash (resets Dock layout; use on a fresh Mac)
   --fail-fast       Stop on the first failed script (old behavior)
   --dry-run         Print scripts that would run without executing
@@ -42,6 +44,7 @@ Environment:
 Examples:
   bash scripts/setup.sh --check
   bash scripts/setup.sh --include-dock
+  bash scripts/setup.sh --dock-check
   bash scripts/setup.sh --fail-fast
   bash scripts/setup.sh --skip office --skip dock
 
@@ -79,6 +82,12 @@ parse_args() {
                 SKIP_LIST+=("$1")
                 ;;
             --include-dock)
+                INCLUDE_DOCK=true
+                ;;
+            --dock-check)
+                DOCK_CHECK=true
+                RUN_APPS=false
+                RUN_OS=false
                 INCLUDE_DOCK=true
                 ;;
             --fail-fast)
@@ -176,6 +185,17 @@ main() {
 
     if $CHECK_ONLY; then
         exec bash "$SCRIPTS_DIR/validate-env.bash"
+    fi
+
+    if $DOCK_CHECK; then
+        log_step "Validating environment"
+        if $DRY_RUN; then
+            echo "[dry-run] bash $SCRIPTS_DIR/validate-env.bash"
+            echo "[dry-run] bash $SCRIPTS_DIR/os/setup-dock.bash --check"
+            exit 0
+        fi
+        bash "$SCRIPTS_DIR/validate-env.bash" || exit 1
+        exec bash "$SCRIPTS_DIR/os/setup-dock.bash" --check
     fi
 
     log_step "Validating environment"

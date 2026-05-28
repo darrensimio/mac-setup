@@ -1,52 +1,122 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODE="apply"
+if [[ "${1:-}" == "--check" ]]; then
+    MODE="check"
+elif [[ -n "${1:-}" ]]; then
+    echo "usage: bash scripts/os/setup-dock.bash [--check]" >&2
+    exit 2
+fi
+
+desired_dock_apps=(
+    "/Applications/Safari.app"
+    "/Applications/Google Chrome.app"
+    "/Applications/Microsoft Edge.app"
+    "/Applications/Spotify.app"
+    "/System/Applications/Mail.app"
+    "/Applications/Proton Mail.app"
+    "/System/Applications/Messages.app"
+    "/Applications/WhatsApp.app"
+    "/Applications/Telegram.app"
+    "/Applications/Notion.app"
+    "/Applications/Microsoft Word.app"
+    "/Applications/Microsoft Excel.app"
+    "/Applications/Microsoft PowerPoint.app"
+    "/System/Applications/App Store.app"
+    "/System/Applications/System Settings.app"
+    "/Applications/Proton Pass.app"
+    "/Applications/1Password.app"
+    "/Applications/Windows App.app"
+    "/Applications/iTerm.app"
+    "/Applications/Visual Studio Code.app"
+)
+
+get_current_dock_apps() {
+    python3 <<'PY'
+import plistlib
+import subprocess
+import urllib.parse
+
+try:
+    raw = subprocess.check_output(["defaults", "export", "com.apple.dock", "-"], stderr=subprocess.DEVNULL)
+except Exception:
+    raise SystemExit(0)
+
+try:
+    data = plistlib.loads(raw)
+except Exception:
+    raise SystemExit(0)
+
+apps = []
+for item in data.get("persistent-apps", []) or []:
+    td = (item or {}).get("tile-data", {}) or {}
+    fd = td.get("file-data", {}) or {}
+    path = fd.get("_CFURLString")
+    if not isinstance(path, str):
+        continue
+    if path.startswith("file://"):
+        # e.g. file:///Applications/Safari.app/
+        parsed = urllib.parse.urlparse(path)
+        path = urllib.parse.unquote(parsed.path)
+    if path.endswith("/"):
+        path = path[:-1]
+    if path.endswith(".app"):
+        apps.append(path)
+
+print("\n".join(apps))
+PY
+}
+
+if [[ "$MODE" == "check" ]]; then
+    current=()
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && current+=("$line")
+    done < <(get_current_dock_apps)
+
+    ok=true
+    if (( ${#current[@]} == 0 )); then
+        echo "Dock check: could not read current Dock persistent-apps." >&2
+        exit 2
+    fi
+
+    if (( ${#current[@]} != ${#desired_dock_apps[@]} )); then
+        ok=false
+        echo "Dock check: count differs (current=${#current[@]} desired=${#desired_dock_apps[@]})"
+    fi
+
+    for i in "${!desired_dock_apps[@]}"; do
+        want="${desired_dock_apps[$i]}"
+        got="${current[$i]:-}"
+        if [[ "$want" != "$got" ]]; then
+            ok=false
+            printf 'Dock check: mismatch at position %d\n  desired: %s\n  current: %s\n' "$((i+1))" "$want" "${got:-<missing>}"
+        fi
+    done
+
+    if $ok; then
+        echo "✅ Dock check passed (apps + order match desired)."
+        exit 0
+    fi
+
+    echo ""
+    echo "To apply the desired Dock layout:"
+    echo "  bash scripts/setup.sh --os-only --skip display --skip widget --include-dock"
+    exit 1
+fi
+
+add_app_to_dock() {
+    local app_path="$1"
+    defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>${app_path}</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
+}
 
 # Clear the Dock
 # Removes all default apps to start with a blank slate
 defaults write com.apple.dock persistent-apps -array ""
 
-# Add Web Browsers
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Safari.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Safari
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Google Chrome.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Google Chrome
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Microsoft Edge.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Microsoft Edge
-
-# Add Spotify
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Spotify.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Spotify
-
-# Add Email Clients
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/Mail.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Mail
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Proton Mail.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Proton Mail
-
-# Add Messaging Apps
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/Messages.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Messages
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/WhatsApp.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # WhatsApp
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Telegram.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Telegram
-
-# Add Notion AI
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Notion.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Notion
-
-# Add Microsoft Office Suite
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Microsoft Word.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Microsoft Excel.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Microsoft PowerPoint.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
-
-# Add App Store
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/App Store.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # App Store
-
-# Add System Settings
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/System/Applications/System Settings.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
-
-# Add Password Managers
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Proton Pass.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # Proton Pass
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/1Password.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>" # 1Password
-
-# Add Windows App
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Windows App.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
-
-# Add iTerm
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/iTerm.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
-
-# Add VS Code
-defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>/Applications/Visual Studio Code.app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"
+for app in "${desired_dock_apps[@]}"; do
+    add_app_to_dock "$app"
+done
 
 # Set static Dock size to smallest (24)
 defaults write com.apple.dock tilesize -int 24
@@ -82,4 +152,4 @@ defaults write com.apple.dock wvous-br-modifier -int 0
 killall cfprefsd
 killall Dock
 
-echo "Dock reset complete: Finder, System Settings, and MS Office Suite only."
+echo "Dock reset complete."

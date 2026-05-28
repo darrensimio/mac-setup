@@ -164,6 +164,7 @@ cd mac-setup
 
 bash scripts/setup.sh --check
 bash scripts/setup.sh --include-dock   # fresh Mac: full run including Dock reset
+bash scripts/setup.sh --dock-check     # check current Dock against desired (no changes)
 ```
 
 Re-run without resetting the Dock:
@@ -277,6 +278,12 @@ Dock and related security settings via `defaults write` (not `dockutil`). **Rese
 - Bottom-left and bottom-right hot corners: lock screen
 - Require password immediately after sleep or screen saver
 - Restarts Dock to apply changes
+
+To check the current Dock state (apps + order) without applying changes:
+
+```bash
+bash scripts/setup.sh --dock-check
+```
 
 ### `scripts/os/setup-display.bash`
 
