@@ -163,6 +163,18 @@ git clone <your-clone-url>
 cd mac-setup
 ```
 
+Update Dock only (applies the Dock layout + related settings):
+
+```bash
+bash scripts/setup.sh --os-only --skip display --skip widget --include-dock
+```
+
+Check current Dock vs desired (no changes):
+
+```bash
+bash scripts/setup.sh --dock-check
+```
+
 Check prerequisites:
 
 ```bash
@@ -173,12 +185,6 @@ Fresh Mac (full run including Dock reset):
 
 ```bash
 bash scripts/setup.sh --include-dock
-```
-
-Check current Dock vs desired (no changes):
-
-```bash
-bash scripts/setup.sh --dock-check
 ```
 
 Re-run without resetting the Dock:
