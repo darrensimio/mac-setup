@@ -14,6 +14,9 @@ if [[ -d "/Applications/Moom Classic.app" ]]; then
     open -a "Moom Classic" 2>/dev/null || true
 fi
 
+# Optional local preference restore (gitignored by default; see scripts/applications/configs/README.md)
+restore_plist_if_present "moom-classic/com.manytricks.Moom.plist"
+
 if install_cask_if_missing "Spotify.app" spotify; then
     open -a Spotify 2>/dev/null || true
 fi

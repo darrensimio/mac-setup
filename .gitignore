@@ -421,5 +421,8 @@ FodyWeavers.xsd
 scripts/applications/configs/*
 !scripts/applications/configs/.gitkeep
 !scripts/applications/configs/README.md
+!scripts/applications/configs/moom-classic/
+!scripts/applications/configs/moom-classic/com.manytricks.Moom.plist
+scripts/applications/configs/moom-classic/com.manytricks.moom
 .mac-setup-last-run.tsv
 .mac-setup-last-run-errors.log
