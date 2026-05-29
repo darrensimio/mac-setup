@@ -227,6 +227,7 @@ scripts/
   os/
     setup-dock.bash
     setup-display.bash
+    setup-mail.bash
     setup-widget.bash
 ```
 
@@ -306,6 +307,18 @@ Installs `mas` via Homebrew when missing (before App Store installs).
 
 - `eu.exelban.Stats.plist` → `~/Library/Preferences/`
 
+### `scripts/os/setup-mail.bash`
+
+Apple Mail (System Mail.app) preferences via `defaults write -app Mail`:
+
+- **New message sound** → `None` (no sound when mail arrives)
+
+Runs as part of `bash scripts/setup.sh --os-only` (skip with `--skip mail`). Mail is quit briefly before writing prefs. On a brand-new Mac, open Mail at least once so its preferences container exists; the script still writes the key for the next launch.
+
+```bash
+bash scripts/os/setup-mail.bash
+```
+
 ### `scripts/os/setup-dock.bash`
 
 Dock and related security settings via `defaults write` (not `dockutil`). **Resets the Dock every time it runs** — use via `setup.sh --include-dock` on a new Mac, or run directly when intentional.
@@ -341,7 +354,7 @@ Disables desktop widgets (`com.apple.WindowManager`, `com.apple.widgets`) and re
 | Scripts | Re-run behavior |
 |---------|-----------------|
 | Application installs | Skip apps/tools already present; failed installs are retried on the next run |
-| `setup-display.bash`, `setup-widget.bash` | Re-apply settings (generally safe) |
+| `setup-display.bash`, `setup-widget.bash`, `setup-mail.bash` | Re-apply settings (generally safe) |
 | `setup-dock.bash` | **Clears and rebuilds Dock** — use `--include-dock` only when you want that |
 
 Failed `mas` or `brew` installs do not stop the rest of the run (unless you pass `--fail-fast` to `setup.sh`).
