@@ -30,6 +30,7 @@ desired_dock_apps=(
     "/Applications/Windows App.app"
     "/Applications/iTerm.app"
     "/Applications/Visual Studio Code.app"
+    "/Applications/Cursor.app"
 )
 
 get_current_dock_apps() {
