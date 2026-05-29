@@ -244,15 +244,23 @@ ensure_mas_installed() {
 
 mac_setup_pref_dest() {
     local file="$1"
-    echo "$HOME/Library/Preferences/$(basename "$file")"
+    local container_id="${2:-}"
+    local pref_name
+    pref_name="$(basename "$file")"
+    if [[ -n "$container_id" ]]; then
+        echo "$HOME/Library/Containers/$container_id/Data/Library/Preferences/$pref_name"
+        return 0
+    fi
+    echo "$HOME/Library/Preferences/$pref_name"
 }
 
 # Prints: no_source | not_applied | applied
 mac_setup_config_status() {
     local file="$1"
+    local container_id="${2:-}"
     local src="$CONFIGS_DIR/$file"
     local dest
-    dest="$(mac_setup_pref_dest "$file")"
+    dest="$(mac_setup_pref_dest "$file" "$container_id")"
     if [[ ! -f "$src" ]]; then
         echo "no_source"
         return 0
@@ -270,19 +278,25 @@ mac_setup_config_status() {
 
 restore_plist_if_present() {
     local file="$1"
+    local container_id="${2:-}"
     local src="$CONFIGS_DIR/$file"
     local pref_name dest domain
     pref_name="$(basename "$file")"
-    dest="$(mac_setup_pref_dest "$file")"
+    dest="$(mac_setup_pref_dest "$file" "$container_id")"
     domain="${pref_name%.plist}"
     if [[ ! -f "$src" ]]; then
         echo "ℹ️  No $file found in $CONFIGS_DIR. Skipping restore."
         mac_setup_report "skipped" "Preferences: $domain"
         return 0
     fi
+    mkdir -p "$(dirname "$dest")"
     if cp "$src" "$dest"; then
         defaults read "$domain" >/dev/null 2>&1 || true
-        echo "✅ Preferences restored from $src"
+        if [[ -n "$container_id" ]]; then
+            echo "✅ Preferences restored to app container: $dest"
+        else
+            echo "✅ Preferences restored from $src"
+        fi
         mac_setup_report "completed" "Preferences: $domain"
         return 0
     fi

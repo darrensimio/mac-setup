@@ -28,7 +28,12 @@ if install_cask_if_missing "Hidden Bar.app" hiddenbar; then
     open -a "Hidden Bar" 2>/dev/null || true
 fi
 
-restore_plist_if_present "hidden-bar/com.dwarvesv.minimalbar.plist"
+# Hidden Bar is sandboxed — prefs live in ~/Library/Containers/... not ~/Library/Preferences/
+restore_plist_if_present "hidden-bar/com.dwarvesv.minimalbar.plist" "com.dwarvesv.minimalbar"
+if [[ -d "/Applications/Hidden Bar.app" ]]; then
+    killall "Hidden Bar" 2>/dev/null || true
+    open -a "Hidden Bar" 2>/dev/null || true
+fi
 
 install_cask_if_missing "DisplayLink Manager.app" displaylink
 

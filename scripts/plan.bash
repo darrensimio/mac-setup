@@ -78,11 +78,11 @@ PLAN_APPS=(
     "utils|Stats|cask|Stats.app|"
 )
 
-# group|label|config_path|optional_app_file (under /Applications)
+# group|label|config_path|optional_app_file|optional_container_id
 PLAN_CONFIGS=(
-    "utils|Moom Classic|moom-classic/com.manytricks.Moom.plist|Moom Classic.app"
-    "utils|Hidden Bar|hidden-bar/com.dwarvesv.minimalbar.plist|Hidden Bar.app"
-    "utils|Stats|eu.exelban.Stats.plist|Stats.app"
+    "utils|Moom Classic|moom-classic/com.manytricks.Moom.plist|Moom Classic.app|"
+    "utils|Hidden Bar|hidden-bar/com.dwarvesv.minimalbar.plist|Hidden Bar.app|com.dwarvesv.minimalbar"
+    "utils|Stats|eu.exelban.Stats.plist|Stats.app|"
 )
 
 plan_app_installed() {
@@ -142,12 +142,12 @@ plan_print_configs() {
     printf "| %-10s | %-18s | %-10s | %-12s | %-18s |\n" "Group" "Item" "In repo" "On machine" "Status"
     printf "| %-10s | %-18s | %-10s | %-12s | %-18s |\n" "----------" "------------------" "----------" "------------" "------------------"
 
-    local entry group label file app_file src dest
+    local entry group label file app_file container_id src dest
     local in_repo_raw on_machine_raw in_repo_col on_machine_col status_col app_ok_col
     for entry in "${PLAN_CONFIGS[@]}"; do
-        IFS='|' read -r group label file app_file <<<"$entry"
+        IFS='|' read -r group label file app_file container_id <<<"$entry"
         src="$CONFIGS_DIR/$file"
-        dest="$(mac_setup_pref_dest "$file")"
+        dest="$(mac_setup_pref_dest "$file" "$container_id")"
 
         if [[ -f "$src" ]]; then
             in_repo_raw="yes"
@@ -163,7 +163,7 @@ plan_print_configs() {
         fi
         on_machine_col="$(plan_style_yes_no "$on_machine_raw")"
 
-        case "$(mac_setup_config_status "$file")" in
+        case "$(mac_setup_config_status "$file" "$container_id")" in
             no_source)
                 status_col="$(plan_style dim "no source in repo")"
                 ;;
