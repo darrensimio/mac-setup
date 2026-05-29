@@ -7,6 +7,37 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/common.bash"
 mac_setup_init_paths
 
+PLAN_USE_COLOR=false
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+    PLAN_USE_COLOR=true
+fi
+
+plan_style() {
+    local style="$1"
+    shift
+    local text="$*"
+    if ! $PLAN_USE_COLOR; then
+        printf '%s' "$text"
+        return 0
+    fi
+    case "$style" in
+        ok) printf '\033[32m%s\033[0m' "$text" ;;
+        warn) printf '\033[33m%s\033[0m' "$text" ;;
+        bad) printf '\033[31m%s\033[0m' "$text" ;;
+        dim) printf '\033[2m%s\033[0m' "$text" ;;
+        bold) printf '\033[1m%s\033[0m' "$text" ;;
+        *) printf '%s' "$text" ;;
+    esac
+}
+
+plan_style_yes_no() {
+    if [[ "$1" == "yes" ]]; then
+        plan_style ok "yes"
+    else
+        plan_style dim "no"
+    fi
+}
+
 # group|name|kind|arg1|arg2 (optional app file for mas)
 PLAN_APPS=(
     "office|Microsoft Word|mas|462054704|Microsoft Word.app"
@@ -87,16 +118,16 @@ plan_print_apps() {
     printf "| %-10s | %-28s | %-18s |\n" "Group" "Item" "Install"
     printf "| %-10s | %-28s | %-18s |\n" "----------" "----------------------------" "------------------"
 
-    local entry group name kind arg1 arg2 status
+    local entry group name kind arg1 arg2 status_col
     for entry in "${PLAN_APPS[@]}"; do
         IFS='|' read -r group name kind arg1 arg2 <<<"$entry"
         if plan_app_installed "$kind" "$arg1" "$arg2"; then
-            status="installed"
+            status_col="$(plan_style ok "installed")"
         else
-            status="not installed"
+            status_col="$(plan_style warn "not installed")"
             drift=1
         fi
-        printf "| %-10s | %-28s | %-18s |\n" "$group" "$name" "$status"
+        printf "| %-10s | %-28s | %b |\n" "$group" "$name" "$status_col"
     done
 
     echo ""
@@ -110,50 +141,56 @@ plan_print_configs() {
     printf "| %-10s | %-18s | %-10s | %-12s | %-18s |\n" "Group" "Item" "In repo" "On machine" "Status"
     printf "| %-10s | %-18s | %-10s | %-12s | %-18s |\n" "----------" "------------------" "----------" "------------" "------------------"
 
-    local entry group label file app_file src dest in_repo on_machine status app_ok
+    local entry group label file app_file src dest
+    local in_repo_raw on_machine_raw in_repo_col on_machine_col status_col app_ok_col
     for entry in "${PLAN_CONFIGS[@]}"; do
         IFS='|' read -r group label file app_file <<<"$entry"
         src="$CONFIGS_DIR/$file"
         dest="$(mac_setup_pref_dest "$file")"
 
         if [[ -f "$src" ]]; then
-            in_repo="yes"
+            in_repo_raw="yes"
         else
-            in_repo="no"
+            in_repo_raw="no"
         fi
+        in_repo_col="$(plan_style_yes_no "$in_repo_raw")"
 
         if [[ -f "$dest" ]]; then
-            on_machine="yes"
+            on_machine_raw="yes"
         else
-            on_machine="no"
+            on_machine_raw="no"
         fi
+        on_machine_col="$(plan_style_yes_no "$on_machine_raw")"
 
-        status="$(mac_setup_config_status "$file")"
-        case "$status" in
-            no_source) status="no source in repo" ;;
+        case "$(mac_setup_config_status "$file")" in
+            no_source)
+                status_col="$(plan_style dim "no source in repo")"
+                ;;
             not_applied)
-                if [[ "$in_repo" == "yes" ]]; then
-                    status="not applied"
+                if [[ "$in_repo_raw" == "yes" ]]; then
+                    status_col="$(plan_style warn "not applied")"
                     drift=1
                 else
-                    status="no source in repo"
+                    status_col="$(plan_style dim "no source in repo")"
                 fi
                 ;;
-            applied) status="applied" ;;
+            applied)
+                status_col="$(plan_style ok "applied")"
+                ;;
         esac
 
         if [[ -n "$app_file" ]]; then
             if [[ -d "/Applications/$app_file" ]]; then
-                app_ok="(app installed)"
+                app_ok_col="$(plan_style dim "(app installed)")"
             else
-                app_ok="(app not installed)"
+                app_ok_col="$(plan_style warn "(app not installed)")"
             fi
         else
-            app_ok=""
+            app_ok_col=""
         fi
 
-        printf "| %-10s | %-18s | %-10s | %-12s | %-18s %s\n" \
-            "$group" "$label" "$in_repo" "$on_machine" "$status" "$app_ok"
+        printf "| %-10s | %-18s | %b | %b | %b %b\n" \
+            "$group" "$label" "$in_repo_col" "$on_machine_col" "$status_col" "$app_ok_col"
     done
 
     echo ""
@@ -183,17 +220,24 @@ main() {
     plan_print_dock || dock_drift=$?
 
     echo "Legend:"
-    echo "  Applications: installed = present on this Mac; not installed = setup would install"
-    echo "  Configuration: applied = ~/Library/Preferences matches repo; not applied = repo has a plist but machine differs or is missing"
+    if $PLAN_USE_COLOR; then
+        echo "  $(plan_style ok "green") = installed / applied / yes"
+        echo "  $(plan_style warn "yellow") = not installed / not applied (setup would change)"
+        echo "  $(plan_style dim "dim") = no / no source in repo"
+    else
+        echo "  Applications: installed = present on this Mac; not installed = setup would install"
+        echo "  Configuration: applied = ~/Library/Preferences matches repo; not applied = repo has a plist but machine differs or is missing"
+    fi
     echo "  Dock: run setup with --include-dock to apply"
+    echo "  Set NO_COLOR=1 or pipe output to disable colors."
     echo ""
 
     if (( app_drift == 0 && config_drift == 0 && dock_drift == 0 )); then
-        echo "✅ Plan: machine matches desired apps, configs, and Dock."
+        echo "$(plan_style ok "✅ Plan: machine matches desired apps, configs, and Dock.")"
         exit 0
     fi
 
-    echo "⚠️  Plan: drift detected. Run setup to install missing apps or apply configs:"
+    echo "$(plan_style warn "⚠️  Plan: drift detected. Run setup to install missing apps or apply configs:")"
     echo "    bash scripts/setup.sh"
     echo "    bash scripts/setup.sh --apps-only          # apps + preference restores"
     echo "    bash scripts/setup.sh --os-only --skip display --skip widget --include-dock   # Dock only"

@@ -254,6 +254,8 @@ See `bash scripts/setup.sh --help`.
 
 Exit code `0` when everything matches; `1` when anything would change on a full setup run.
 
+When stdout is a terminal, status labels are colorized (green = OK, yellow = would change, dim = N/A). Set `NO_COLOR=1` or pipe output to disable colors.
+
 ### `scripts/applications/setup-office-productivity.bash`
 
 Work and productivity apps.
