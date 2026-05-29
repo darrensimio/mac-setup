@@ -424,5 +424,7 @@ scripts/applications/configs/*
 !scripts/applications/configs/moom-classic/
 !scripts/applications/configs/moom-classic/com.manytricks.Moom.plist
 scripts/applications/configs/moom-classic/com.manytricks.moom
+!scripts/applications/configs/hidden-bar/
+!scripts/applications/configs/hidden-bar/com.dwarvesv.minimalbar.plist
 .mac-setup-last-run.tsv
 .mac-setup-last-run-errors.log

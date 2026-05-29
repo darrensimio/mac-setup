@@ -28,6 +28,8 @@ if install_cask_if_missing "Hidden Bar.app" hiddenbar; then
     open -a "Hidden Bar" 2>/dev/null || true
 fi
 
+restore_plist_if_present "hidden-bar/com.dwarvesv.minimalbar.plist"
+
 install_cask_if_missing "DisplayLink Manager.app" displaylink
 
 if ! command -v stats &>/dev/null && [[ ! -d "/Applications/Stats.app" ]]; then

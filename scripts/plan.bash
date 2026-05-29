@@ -81,6 +81,7 @@ PLAN_APPS=(
 # group|label|config_path|optional_app_file (under /Applications)
 PLAN_CONFIGS=(
     "utils|Moom Classic|moom-classic/com.manytricks.Moom.plist|Moom Classic.app"
+    "utils|Hidden Bar|hidden-bar/com.dwarvesv.minimalbar.plist|Hidden Bar.app"
     "utils|Stats|eu.exelban.Stats.plist|Stats.app"
 )
 

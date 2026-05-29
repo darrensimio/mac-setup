@@ -6,6 +6,7 @@ Place optional preference files here to restore during setup. These files are **
 |------|-------------|
 | `eu.exelban.Stats.plist` | `setup-utils.bash` → `~/Library/Preferences/` |
 | `moom-classic/com.manytricks.Moom.plist` | `setup-utils.bash` → `~/Library/Preferences/` |
+| `hidden-bar/com.dwarvesv.minimalbar.plist` | `setup-utils.bash` → `~/Library/Preferences/` |
 
 Notes:
 - `moom-classic/com.manytricks.moom` is a local Many Tricks receipt / license artifact. It is copied for backup convenience but is **not** restored by scripts.
