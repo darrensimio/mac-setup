@@ -175,6 +175,12 @@ Check current Dock vs desired (no changes):
 bash scripts/setup.sh --dock-check
 ```
 
+See what is installed and which configs match the repo (Terraform-style plan):
+
+```bash
+bash scripts/setup.sh --plan
+```
+
 Check prerequisites:
 
 ```bash
@@ -208,6 +214,7 @@ You can still run scripts under `scripts/applications/` and `scripts/os/` direct
 ```
 scripts/
   setup.sh              # orchestrator (recommended entrypoint)
+  plan.bash             # read-only install + config drift report
   validate-env.bash     # prerequisite checks
   lib/
     common.bash         # shared install helpers
@@ -238,6 +245,14 @@ Runs application then OS scripts in order. **Dock reset is off by default** — 
 **Summary table:** At the end of a run, `setup.sh` prints a table of each app/tool and OS step with status (Installed, Already installed, Failed, Skipped, etc.). Failed items are followed by a **Failure details** section with the full command output. Results are saved to `.mac-setup-last-run.tsv` and `.mac-setup-last-run-errors.log` in the repo root.
 
 See `bash scripts/setup.sh --help`.
+
+**Plan (read-only):** `bash scripts/setup.sh --plan` (or `bash scripts/plan.bash`) prints two tables:
+
+- **Applications** — each package in the repo vs installed on this Mac
+- **Configuration** — each optional plist in `scripts/applications/configs/` vs `~/Library/Preferences/` (e.g. Moom installed but plist not applied yet shows `not applied`)
+- **Dock** — same check as `--dock-check`
+
+Exit code `0` when everything matches; `1` when anything would change on a full setup run.
 
 ### `scripts/applications/setup-office-productivity.bash`
 

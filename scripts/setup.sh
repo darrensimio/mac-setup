@@ -33,6 +33,7 @@ Options:
   --skip NAME       Skip a script group (repeatable):
                     office, devtools, terminal, utils, display, widget, dock
   --dock-check      Check current Dock apps/order vs desired (no changes)
+  --plan            Show installed apps and applied configs vs repo (read-only)
   --include-dock    Run setup-dock.bash (resets Dock layout; use on a fresh Mac)
   --fail-fast       Stop on the first failed script (old behavior)
   --dry-run         Print scripts that would run without executing
@@ -45,6 +46,7 @@ Examples:
   bash scripts/setup.sh --check
   bash scripts/setup.sh --include-dock
   bash scripts/setup.sh --dock-check
+  bash scripts/setup.sh --plan
   bash scripts/setup.sh --fail-fast
   bash scripts/setup.sh --skip office --skip dock
 
@@ -89,6 +91,9 @@ parse_args() {
                 RUN_APPS=false
                 RUN_OS=false
                 INCLUDE_DOCK=true
+                ;;
+            --plan)
+                exec bash "$SCRIPTS_DIR/plan.bash"
                 ;;
             --fail-fast)
                 FAIL_FAST=true

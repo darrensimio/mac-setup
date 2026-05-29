@@ -242,23 +242,52 @@ ensure_mas_installed() {
     return 0
 }
 
+mac_setup_pref_dest() {
+    local file="$1"
+    echo "$HOME/Library/Preferences/$(basename "$file")"
+}
+
+# Prints: no_source | not_applied | applied
+mac_setup_config_status() {
+    local file="$1"
+    local src="$CONFIGS_DIR/$file"
+    local dest
+    dest="$(mac_setup_pref_dest "$file")"
+    if [[ ! -f "$src" ]]; then
+        echo "no_source"
+        return 0
+    fi
+    if [[ ! -f "$dest" ]]; then
+        echo "not_applied"
+        return 0
+    fi
+    if cmp -s "$src" "$dest"; then
+        echo "applied"
+        return 0
+    fi
+    echo "not_applied"
+}
+
 restore_plist_if_present() {
     local file="$1"
     local src="$CONFIGS_DIR/$file"
+    local pref_name dest domain
+    pref_name="$(basename "$file")"
+    dest="$(mac_setup_pref_dest "$file")"
+    domain="${pref_name%.plist}"
     if [[ ! -f "$src" ]]; then
         echo "ℹ️  No $file found in $CONFIGS_DIR. Skipping restore."
-        mac_setup_report "skipped" "Preferences: ${file%.plist}"
+        mac_setup_report "skipped" "Preferences: $domain"
         return 0
     fi
-    if cp "$src" "$HOME/Library/Preferences/"; then
-        local domain="${file%.plist}"
+    if cp "$src" "$dest"; then
         defaults read "$domain" >/dev/null 2>&1 || true
         echo "✅ Preferences restored from $src"
-        mac_setup_report "completed" "Preferences: ${file%.plist}"
+        mac_setup_report "completed" "Preferences: $domain"
         return 0
     fi
     mac_setup_record_failure "Restore preferences: $file"
-    mac_setup_report_failed "Preferences: ${file%.plist}" "cp failed for $src" "cp $src ~/Library/Preferences/"
+    mac_setup_report_failed "Preferences: $domain" "cp failed for $src" "cp $src $dest"
     return 0
 }
 
