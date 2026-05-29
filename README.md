@@ -251,6 +251,7 @@ See `bash scripts/setup.sh --help`.
 
 - **Applications** — each package in the repo vs installed on this Mac
 - **Configuration** — each optional plist in `scripts/applications/configs/` vs `~/Library/Preferences/` (e.g. Moom installed but plist not applied yet shows `not applied`)
+- **OS settings** — scripted `defaults` targets (e.g. Mail **New message sound** = `None` from `setup-mail.bash`)
 - **Dock** — same check as `--dock-check`
 
 Exit code `0` when everything matches; `1` when anything would change on a full setup run.

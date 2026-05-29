@@ -276,6 +276,20 @@ mac_setup_config_status() {
     echo "not_applied"
 }
 
+# Prints: applied | not_applied | unavailable (Mail prefs missing or unreadable)
+mac_setup_mail_new_message_sound_status() {
+    local current
+    if ! current="$(defaults read -app Mail NewMessagesSoundName 2>/dev/null)"; then
+        echo "unavailable"
+        return 0
+    fi
+    if [[ "$current" == "None" ]]; then
+        echo "applied"
+        return 0
+    fi
+    echo "not_applied"
+}
+
 restore_plist_if_present() {
     local file="$1"
     local container_id="${2:-}"

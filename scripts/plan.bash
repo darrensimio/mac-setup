@@ -198,6 +198,42 @@ plan_print_configs() {
     return "$drift"
 }
 
+plan_print_os_settings() {
+    local drift=0
+    echo "OS settings"
+    echo ""
+    printf "| %-10s | %-22s | %-10s | %-14s | %-18s |\n" "Group" "Item" "Desired" "On machine" "Status"
+    printf "| %-10s | %-22s | %-10s | %-14s | %-18s |\n" "----------" "----------------------" "----------" "--------------" "------------------"
+
+    local desired="None" current current_display status_col
+    current="$(defaults read -app Mail NewMessagesSoundName 2>/dev/null || true)"
+    if [[ -n "$current" ]]; then
+        current_display="$current"
+    else
+        current_display="<unset>"
+    fi
+
+    case "$(mac_setup_mail_new_message_sound_status)" in
+        applied)
+            status_col="$(plan_style ok "applied")"
+            ;;
+        not_applied)
+            status_col="$(plan_style warn "not applied")"
+            drift=1
+            ;;
+        unavailable)
+            status_col="$(plan_style dim "unavailable")"
+            drift=1
+            ;;
+    esac
+
+    printf "| %-10s | %-22s | %b | %-14s | %b |\n" \
+        "os" "Mail: new msg sound" "$(plan_style ok "$desired")" "$current_display" "$status_col"
+
+    echo ""
+    return "$drift"
+}
+
 plan_print_dock() {
     echo "Dock"
     echo ""
@@ -210,7 +246,7 @@ plan_print_dock() {
 }
 
 main() {
-    local app_drift=0 config_drift=0 dock_drift=0
+    local app_drift=0 config_drift=0 os_drift=0 dock_drift=0
 
     echo "mac-setup plan (read-only)"
     echo "Compares this machine to packages and configs defined in the repo."
@@ -218,6 +254,7 @@ main() {
 
     plan_print_apps || app_drift=$?
     plan_print_configs || config_drift=$?
+    plan_print_os_settings || os_drift=$?
     plan_print_dock || dock_drift=$?
 
     echo "Legend:"
@@ -228,19 +265,22 @@ main() {
     else
         echo "  Applications: installed = present on this Mac; not installed = setup would install"
         echo "  Configuration: applied = ~/Library/Preferences matches repo; not applied = repo has a plist but machine differs or is missing"
+        echo "  OS settings: applied = matches setup-os scripts (e.g. Mail new message sound = None)"
     fi
     echo "  Dock: run setup with --include-dock to apply"
     echo "  Set NO_COLOR=1 or pipe output to disable colors."
     echo ""
 
-    if (( app_drift == 0 && config_drift == 0 && dock_drift == 0 )); then
-        echo "$(plan_style ok "✅ Plan: machine matches desired apps, configs, and Dock.")"
+    if (( app_drift == 0 && config_drift == 0 && os_drift == 0 && dock_drift == 0 )); then
+        echo "$(plan_style ok "✅ Plan: machine matches desired apps, configs, OS settings, and Dock.")"
         exit 0
     fi
 
     echo "$(plan_style warn "⚠️  Plan: drift detected. Run setup to install missing apps or apply configs:")"
     echo "    bash scripts/setup.sh"
     echo "    bash scripts/setup.sh --apps-only          # apps + preference restores"
+    echo "    bash scripts/setup.sh --os-only --skip display --skip widget --skip dock   # Mail + other OS (not Dock)"
+    echo "    bash scripts/os/setup-mail.bash            # Mail only"
     echo "    bash scripts/setup.sh --os-only --skip display --skip widget --include-dock   # Dock only"
     exit 1
 }
