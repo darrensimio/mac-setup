@@ -198,6 +198,18 @@ plan_print_configs() {
     return "$drift"
 }
 
+plan_os_setting_row() {
+    local group="$1" label="$2" desired="$3" current_display="$4" status="$5"
+    local status_col
+    case "$status" in
+        applied) status_col="$(plan_style ok "applied")" ;;
+        not_applied) status_col="$(plan_style warn "not applied")" ;;
+        *) status_col="$(plan_style dim "unavailable")" ;;
+    esac
+    printf "| %-10s | %-22s | %b | %-14s | %b |\n" \
+        "$group" "$label" "$(plan_style ok "$desired")" "$current_display" "$status_col"
+}
+
 plan_print_os_settings() {
     local drift=0
     echo "OS settings"
@@ -205,30 +217,18 @@ plan_print_os_settings() {
     printf "| %-10s | %-22s | %-10s | %-14s | %-18s |\n" "Group" "Item" "Desired" "On machine" "Status"
     printf "| %-10s | %-22s | %-10s | %-14s | %-18s |\n" "----------" "----------------------" "----------" "--------------" "------------------"
 
-    local desired="None" current current_display status_col
+    local current status
     current="$(defaults read -app Mail NewMessagesSoundName 2>/dev/null || true)"
-    if [[ -n "$current" ]]; then
-        current_display="$current"
-    else
-        current_display="<unset>"
-    fi
+    [[ -n "$current" ]] || current="<unset>"
+    status="$(mac_setup_mail_new_message_sound_status)"
+    plan_os_setting_row "os" "Mail: new msg sound" "None" "$current" "$status"
+    [[ "$status" == "applied" ]] || drift=1
 
-    case "$(mac_setup_mail_new_message_sound_status)" in
-        applied)
-            status_col="$(plan_style ok "applied")"
-            ;;
-        not_applied)
-            status_col="$(plan_style warn "not applied")"
-            drift=1
-            ;;
-        unavailable)
-            status_col="$(plan_style dim "unavailable")"
-            drift=1
-            ;;
-    esac
-
-    printf "| %-10s | %-22s | %b | %-14s | %b |\n" \
-        "os" "Mail: new msg sound" "$(plan_style ok "$desired")" "$current_display" "$status_col"
+    current="$(defaults read -app Mail PlayMailSounds 2>/dev/null || true)"
+    [[ -n "$current" ]] || current="<unset>"
+    status="$(mac_setup_mail_play_sounds_status)"
+    plan_os_setting_row "os" "Mail: other sounds" "off" "$current" "$status"
+    [[ "$status" == "applied" ]] || drift=1
 
     echo ""
     return "$drift"

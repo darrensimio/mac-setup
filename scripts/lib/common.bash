@@ -276,18 +276,97 @@ mac_setup_config_status() {
     echo "not_applied"
 }
 
-# Prints: applied | not_applied | unavailable (Mail prefs missing or unreadable)
-mac_setup_mail_new_message_sound_status() {
+# True when new-message sound is off (None, empty, or key absent).
+mac_setup_mail_new_message_sound_off() {
     local current
     if ! current="$(defaults read -app Mail NewMessagesSoundName 2>/dev/null)"; then
+        return 0
+    fi
+    [[ -z "$current" || "$current" == "None" ]]
+}
+
+# Prints: applied | not_applied | unavailable
+mac_setup_mail_new_message_sound_status() {
+    if ! defaults read -app Mail &>/dev/null; then
         echo "unavailable"
         return 0
     fi
-    if [[ "$current" == "None" ]]; then
+    if mac_setup_mail_new_message_sound_off; then
         echo "applied"
         return 0
     fi
     echo "not_applied"
+}
+
+# True when "Play sounds for other mail actions" is off.
+mac_setup_mail_play_sounds_off() {
+    local play
+    if ! play="$(defaults read -app Mail PlayMailSounds 2>/dev/null)"; then
+        return 0
+    fi
+    [[ "$play" == "0" || "$play" == "false" || "$play" == "False" ]]
+}
+
+# Prints: applied | not_applied | unavailable
+mac_setup_mail_play_sounds_status() {
+    if ! defaults read -app Mail &>/dev/null; then
+        echo "unavailable"
+        return 0
+    fi
+    if mac_setup_mail_play_sounds_off; then
+        echo "applied"
+        return 0
+    fi
+    echo "not_applied"
+}
+
+mac_setup_mail_apply_sound_prefs() {
+    defaults delete -app Mail NewMessagesSoundName 2>/dev/null || true
+    defaults write -app Mail NewMessagesSoundName -string "None" 2>/dev/null || true
+    defaults write -app Mail MailSound -string "" 2>/dev/null || true
+    defaults write -app Mail PlayMailSounds -bool false 2>/dev/null || true
+}
+
+mac_setup_mail_apply_sound_prefs_ui() {
+    osascript <<'APPLESCRIPT' 2>/dev/null
+tell application "Mail" to activate
+delay 1
+tell application "System Events"
+    keystroke "," using command down
+    delay 1.5
+    tell process "Mail"
+        try
+            if exists button "General" of toolbar 1 of window 1 then
+                click button "General" of toolbar 1 of window 1
+            end if
+        end try
+        delay 0.6
+        repeat with pb in (every pop up button of window 1)
+            try
+                set pbName to name of pb
+                set pbDesc to description of pb
+                if pbName contains "sound" or pbDesc contains "sound" or pbName contains "Sound" or pbDesc contains "Sound" then
+                    if value of pb is not "None" then
+                        click pb
+                        delay 0.4
+                        click menu item "None" of menu 1 of pb
+                    end if
+                end if
+            end try
+        end repeat
+        repeat with cb in (every checkbox of window 1)
+            try
+                if (name of cb contains "Play sounds") or (description of cb contains "Play sounds") then
+                    if value of cb is 1 then click cb
+                end if
+            end try
+        end repeat
+        try
+            click button 1 of window 1
+        end try
+    end tell
+end tell
+APPLESCRIPT
 }
 
 restore_plist_if_present() {

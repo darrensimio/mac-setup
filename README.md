@@ -310,9 +310,12 @@ Installs `mas` via Homebrew when missing (before App Store installs).
 
 ### `scripts/os/setup-mail.bash`
 
-Apple Mail (System Mail.app) preferences via `defaults write -app Mail`:
+Apple Mail (System Mail.app) preferences:
 
-- **New message sound** → `None` (no sound when mail arrives)
+- **New message sound** → `None`
+- **Play sounds for other mail actions** → off (`PlayMailSounds` = false)
+
+Uses `defaults write -app Mail` plus AppleScript to drive **Mail → Settings → General** (needs **Accessibility** for UI automation; **Full Disk Access** helps read/write sandboxed Mail prefs).
 
 Runs as part of `bash scripts/setup.sh --os-only` (skip with `--skip mail`). Mail is quit briefly before writing prefs. On a brand-new Mac, open Mail at least once so its preferences container exists; the script still writes the key for the next launch.
 
