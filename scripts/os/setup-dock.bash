@@ -19,6 +19,7 @@ desired_dock_apps=(
     "/System/Applications/Messages.app"
     "/Applications/WhatsApp.app"
     "/Applications/Telegram.app"
+    "/Applications/Post-it.app"
     "/Applications/Notion.app"
     "/Applications/Microsoft Word.app"
     "/Applications/Microsoft Excel.app"

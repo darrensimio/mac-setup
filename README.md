@@ -297,12 +297,14 @@ Utilities and peripheral software.
 
 | Source | Packages |
 |--------|----------|
-| Mac App Store (`mas`) | Moom Classic, Caffeinated (paid) |
+| Mac App Store (`mas`) | Moom Classic, Caffeinated (paid), Post-it |
 | Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, Stats |
 
 Installs `mas` via Homebrew when missing (before App Store installs).
 
 **Caffeinated** uses Mac App Store ID `1362171212` (the Homebrew cask `caffeinated` was removed). It is a paid app — sign in to the App Store and get it on your Apple ID once before `mas install` will work.
+
+**Post-it** uses Mac App Store ID `1475777828` (free; requires macOS 13+).
 
 **Optional preference restore** — place files under `scripts/applications/configs/` (see [configs/README.md](scripts/applications/configs/README.md)):
 
@@ -327,7 +329,7 @@ bash scripts/os/setup-mail.bash
 
 Dock and related security settings via `defaults write` (not `dockutil`). **Resets the Dock every time it runs** — use via `setup.sh --include-dock` on a new Mac, or run directly when intentional.
 
-- Clears the dock, then adds: Safari, Google Chrome, Microsoft Edge, Spotify, Mail, Proton Mail, Messages, WhatsApp, Telegram, Notion, Microsoft Word/Excel/PowerPoint, App Store, System Settings, Proton Pass, 1Password, Windows App, iTerm, Visual Studio Code, Cursor
+- Clears the dock, then adds: Safari, Google Chrome, Microsoft Edge, Spotify, Mail, Proton Mail, Messages, WhatsApp, Telegram, Post-it, Notion, Microsoft Word/Excel/PowerPoint, App Store, System Settings, Proton Pass, 1Password, Windows App, iTerm, Visual Studio Code, Cursor
 - Dock tile size 24, magnification on (large size 96), Recents hidden
 - Bottom-left and bottom-right hot corners: lock screen
 - Require password immediately after sleep or screen saver
