@@ -13,6 +13,8 @@ desired_dock_apps=(
     "/Applications/Safari.app"
     "/Applications/Google Chrome.app"
     "/Applications/Microsoft Edge.app"
+    "/Applications/ChatGPT.app"
+    "/Applications/Poe.app"
     "/Applications/Spotify.app"
     "/System/Applications/Mail.app"
     "/Applications/Proton Mail.app"
