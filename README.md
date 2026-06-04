@@ -223,6 +223,7 @@ scripts/
     setup-devtools.bash
     setup-terminal.bash
     setup-utils.bash
+    setup-genai.bash
     configs/            # local preference files (gitignored)
   os/
     setup-dock.bash
@@ -281,6 +282,20 @@ Developer tools.
 |--------|----------|
 | Homebrew cask | Visual Studio Code (symlinks `code` to `~/.local/bin/code`), Cursor, Bruno |
 | Homebrew formula | tig, gh, htop, curlie |
+
+### `scripts/applications/setup-genai.bash`
+
+Generative AI desktop clients.
+
+| Source | Packages |
+|--------|----------|
+| Homebrew cask | ChatGPT, Poe |
+
+```bash
+bash scripts/applications/setup-genai.bash
+```
+
+Skip with `bash scripts/setup.sh --skip genai`.
 
 ### `scripts/applications/setup-terminal.bash`
 

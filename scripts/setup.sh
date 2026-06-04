@@ -31,7 +31,7 @@ Options:
   --apps-only       Run application install scripts only
   --os-only         Run OS configuration scripts only
   --skip NAME       Skip a script group (repeatable):
-                    office, devtools, terminal, utils, display, widget, mail, dock
+                    office, devtools, terminal, utils, genai, display, widget, mail, dock
   --dock-check      Check current Dock apps/order vs desired (no changes)
   --plan            Show installed apps and applied configs vs repo (read-only)
   --include-dock    Run setup-dock.bash (resets Dock layout; use on a fresh Mac)
@@ -149,6 +149,7 @@ run_applications() {
         "applications/setup-devtools.bash|devtools|Developer tools"
         "applications/setup-terminal.bash|terminal|Terminal environment"
         "applications/setup-utils.bash|utils|Utilities"
+        "applications/setup-genai.bash|genai|Gen AI tools"
     )
     local entry rel skip_name display_name
     for entry in "${scripts[@]}"; do

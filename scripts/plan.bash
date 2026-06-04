@@ -77,6 +77,8 @@ PLAN_APPS=(
     "utils|Hidden Bar|cask|Hidden Bar.app|"
     "utils|DisplayLink Manager|cask|DisplayLink Manager.app|"
     "utils|Stats|cask|Stats.app|"
+    "genai|ChatGPT|cask|ChatGPT.app|"
+    "genai|Poe|cask|Poe.app|"
 )
 
 # group|label|config_path|optional_app_file|optional_container_id
