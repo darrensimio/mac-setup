@@ -74,6 +74,7 @@ PLAN_APPS=(
     "utils|Spotify|cask|Spotify.app|"
     "utils|Caffeinated|mas|1362171212|Caffeinated.app"
     "utils|Post-it|mas|1475777828|Post-it.app"
+    "utils|Hour - World Clock|mas|569089415|Hour.app"
     "utils|Hidden Bar|cask|Hidden Bar.app|"
     "utils|DisplayLink Manager|cask|DisplayLink Manager.app|"
     "utils|Stats|cask|Stats.app|"

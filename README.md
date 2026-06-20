@@ -313,7 +313,7 @@ Utilities and peripheral software.
 
 | Source | Packages |
 |--------|----------|
-| Mac App Store (`mas`) | Moom Classic, Caffeinated (paid), Post-it |
+| Mac App Store (`mas`) | Moom Classic, Caffeinated (paid), Post-it, Hour - World Clock |
 | Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, Stats |
 
 Installs `mas` via Homebrew when missing (before App Store installs).
@@ -321,6 +321,8 @@ Installs `mas` via Homebrew when missing (before App Store installs).
 **Caffeinated** uses Mac App Store ID `1362171212` (the Homebrew cask `caffeinated` was removed). It is a paid app — sign in to the App Store and get it on your Apple ID once before `mas install` will work.
 
 **Post-it** uses Mac App Store ID `1475777828` (free; requires macOS 13+).
+
+**Hour - World Clock** uses Mac App Store ID `569089415` (free menu bar world clock; requires macOS 11+).
 
 **Optional preference restore** — place files under `scripts/applications/configs/` (see [configs/README.md](scripts/applications/configs/README.md)):
 

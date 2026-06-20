@@ -26,6 +26,8 @@ install_mas_app "1362171212" "Caffeinated"
 
 install_mas_app "1475777828" "Post-it"
 
+install_mas_app "569089415" "Hour - World Clock"
+
 if install_cask_if_missing "Hidden Bar.app" hiddenbar; then
     open -a "Hidden Bar" 2>/dev/null || true
 fi
