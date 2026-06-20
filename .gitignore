@@ -426,5 +426,10 @@ scripts/applications/configs/*
 scripts/applications/configs/moom-classic/com.manytricks.moom
 !scripts/applications/configs/hidden-bar/
 !scripts/applications/configs/hidden-bar/com.dwarvesv.minimalbar.plist
+!scripts/applications/configs/hour-world-clock/
+!scripts/applications/configs/hour-world-clock/container/
+!scripts/applications/configs/hour-world-clock/group/
+!scripts/applications/configs/hour-world-clock/container/*.plist
+!scripts/applications/configs/hour-world-clock/group/*.plist
 .mac-setup-last-run.tsv
 .mac-setup-last-run-errors.log

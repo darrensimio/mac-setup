@@ -420,6 +420,80 @@ restore_plist_if_present() {
     return 0
 }
 
+mac_setup_prefs_dir_dest() {
+    local kind="$1"
+    local id="$2"
+    case "$kind" in
+        container) echo "$HOME/Library/Containers/$id/Data/Library/Preferences" ;;
+        group) echo "$HOME/Library/Group Containers/$id/Library/Preferences" ;;
+        *) return 1 ;;
+    esac
+}
+
+# Prints: no_source | not_applied | applied
+mac_setup_config_dir_status() {
+    local rel_dir="$1"
+    local kind="$2"
+    local id="$3"
+    local src="$CONFIGS_DIR/$rel_dir"
+    local dest f base
+    if ! compgen -G "$src/*.plist" >/dev/null; then
+        echo "no_source"
+        return 0
+    fi
+    dest="$(mac_setup_prefs_dir_dest "$kind" "$id")" || { echo "unavailable"; return 0; }
+    for f in "$src"/*.plist; do
+        [[ -f "$f" ]] || continue
+        base="$(basename "$f")"
+        if [[ ! -f "$dest/$base" ]] || ! cmp -s "$f" "$dest/$base"; then
+            echo "not_applied"
+            return 0
+        fi
+    done
+    echo "applied"
+}
+
+restore_prefs_dir_if_present() {
+    local rel_dir="$1"
+    local kind="$2"
+    local id="$3"
+    local label="$4"
+    local src="$CONFIGS_DIR/$rel_dir"
+    local dest f base copied=0
+    if ! compgen -G "$src/*.plist" >/dev/null; then
+        echo "ℹ️  No plists in $rel_dir. Skipping restore."
+        mac_setup_report "skipped" "Preferences: $label"
+        return 0
+    fi
+    dest="$(mac_setup_prefs_dir_dest "$kind" "$id")" || {
+        mac_setup_record_failure "Restore preferences: $label"
+        mac_setup_report_failed "Preferences: $label" "unknown prefs dir kind: $kind" "restore_prefs_dir_if_present"
+        return 0
+    }
+    mkdir -p "$dest"
+    for f in "$src"/*.plist; do
+        [[ -f "$f" ]] || continue
+        base="$(basename "$f")"
+        if cp "$f" "$dest/$base"; then
+            copied=$((copied + 1))
+            defaults read "${base%.plist}" >/dev/null 2>&1 || true
+        fi
+    done
+    if (( copied > 0 )); then
+        echo "✅ Restored $copied preference file(s) for $label → $dest"
+        mac_setup_report "completed" "Preferences: $label"
+        return 0
+    fi
+    mac_setup_record_failure "Restore preferences: $label"
+    mac_setup_report_failed "Preferences: $label" "cp failed for $src/*.plist" "cp $src/*.plist $dest/"
+    return 0
+}
+
+restore_hour_prefs_if_present() {
+    restore_prefs_dir_if_present "hour-world-clock/container" "container" "com.fabriceleyne.hourlite" "Hour - World Clock"
+    restore_prefs_dir_if_present "hour-world-clock/group" "group" "3EYN7PPTPF.com.fabriceleyne.hourlite" "Hour - World Clock (group)"
+}
+
 MAC_SETUP_SUDO_REFRESH_PID=""
 
 mac_setup_acquire_sudo() {

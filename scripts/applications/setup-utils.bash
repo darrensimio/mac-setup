@@ -28,6 +28,14 @@ install_mas_app "1475777828" "Post-it"
 
 install_mas_app "569089415" "Hour - World Clock"
 
+if [[ -d "/Applications/Hour.app" ]]; then
+    killall Hour 2>/dev/null || true
+fi
+restore_hour_prefs_if_present
+if [[ -d "/Applications/Hour.app" ]]; then
+    open -a Hour 2>/dev/null || true
+fi
+
 if install_cask_if_missing "Hidden Bar.app" hiddenbar; then
     open -a "Hidden Bar" 2>/dev/null || true
 fi

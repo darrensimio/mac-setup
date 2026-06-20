@@ -89,6 +89,12 @@ PLAN_CONFIGS=(
     "utils|Stats|eu.exelban.Stats.plist|Stats.app|"
 )
 
+# group|label|rel_dir|optional_app_file|prefs_kind|prefs_id  (prefs_kind: container | group)
+PLAN_CONFIG_DIRS=(
+    "utils|Hour - World Clock|hour-world-clock/container|Hour.app|container|com.fabriceleyne.hourlite"
+    "utils|Hour - World Clock (group)|hour-world-clock/group|Hour.app|group|3EYN7PPTPF.com.fabriceleyne.hourlite"
+)
+
 plan_app_installed() {
     local kind="$1" arg1="$2" arg2="${3:-}"
     case "$kind" in
@@ -168,6 +174,57 @@ plan_print_configs() {
         on_machine_col="$(plan_style_yes_no "$on_machine_raw")"
 
         case "$(mac_setup_config_status "$file" "$container_id")" in
+            no_source)
+                status_col="$(plan_style dim "no source in repo")"
+                ;;
+            not_applied)
+                if [[ "$in_repo_raw" == "yes" ]]; then
+                    status_col="$(plan_style warn "not applied")"
+                    drift=1
+                else
+                    status_col="$(plan_style dim "no source in repo")"
+                fi
+                ;;
+            applied)
+                status_col="$(plan_style ok "applied")"
+                ;;
+        esac
+
+        if [[ -n "$app_file" ]]; then
+            if [[ -d "/Applications/$app_file" ]]; then
+                app_ok_col="$(plan_style dim "(app installed)")"
+            else
+                app_ok_col="$(plan_style warn "(app not installed)")"
+            fi
+        else
+            app_ok_col=""
+        fi
+
+        printf "| %-10s | %-18s | %b | %b | %b %b\n" \
+            "$group" "$label" "$in_repo_col" "$on_machine_col" "$status_col" "$app_ok_col"
+    done
+
+    local rel_dir kind id dest_dir
+    for entry in "${PLAN_CONFIG_DIRS[@]}"; do
+        IFS='|' read -r group label rel_dir app_file kind id <<<"$entry"
+        src="$CONFIGS_DIR/$rel_dir"
+        dest_dir="$(mac_setup_prefs_dir_dest "$kind" "$id")" || dest_dir=""
+
+        if compgen -G "$src/*.plist" >/dev/null; then
+            in_repo_raw="yes"
+        else
+            in_repo_raw="no"
+        fi
+        in_repo_col="$(plan_style_yes_no "$in_repo_raw")"
+
+        if [[ -n "$dest_dir" ]] && compgen -G "$dest_dir/*.plist" >/dev/null; then
+            on_machine_raw="yes"
+        else
+            on_machine_raw="no"
+        fi
+        on_machine_col="$(plan_style_yes_no "$on_machine_raw")"
+
+        case "$(mac_setup_config_dir_status "$rel_dir" "$kind" "$id")" in
             no_source)
                 status_col="$(plan_style dim "no source in repo")"
                 ;;
