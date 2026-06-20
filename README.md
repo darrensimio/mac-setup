@@ -229,6 +229,7 @@ scripts/
     setup-dock.bash
     setup-display.bash
     setup-mail.bash
+    setup-menubar.bash
     setup-widget.bash
 ```
 
@@ -252,7 +253,7 @@ See `bash scripts/setup.sh --help`.
 
 - **Applications** — each package in the repo vs installed on this Mac
 - **Configuration** — each optional plist in `scripts/applications/configs/` vs `~/Library/Preferences/` (e.g. Moom installed but plist not applied yet shows `not applied`)
-- **OS settings** — scripted `defaults` targets (e.g. Mail **New message sound** = `None` from `setup-mail.bash`)
+- **OS settings** — scripted `defaults` targets (e.g. Mail **New message sound** = `None`, battery **show percentage**)
 - **Dock** — same check as `--dock-check`
 
 Exit code `0` when everything matches; `1` when anything would change on a full setup run.
@@ -325,6 +326,19 @@ Installs `mas` via Homebrew when missing (before App Store installs).
 
 - `eu.exelban.Stats.plist` → `~/Library/Preferences/`
 
+### `scripts/os/setup-menubar.bash`
+
+Menu bar / Control Center settings:
+
+- **Battery** → show **percentage** in the menu bar (`BatteryShowPercentage`)
+- Keeps the battery item visible in the menu bar (not Control Center only)
+
+```bash
+bash scripts/os/setup-menubar.bash
+```
+
+Skip with `bash scripts/setup.sh --skip menubar`.
+
 ### `scripts/os/setup-mail.bash`
 
 Apple Mail (System Mail.app) preferences:
@@ -375,7 +389,7 @@ Disables desktop widgets (`com.apple.WindowManager`, `com.apple.widgets`) and re
 | Scripts | Re-run behavior |
 |---------|-----------------|
 | Application installs | Skip apps/tools already present; failed installs are retried on the next run |
-| `setup-display.bash`, `setup-widget.bash`, `setup-mail.bash` | Re-apply settings (generally safe) |
+| `setup-display.bash`, `setup-widget.bash`, `setup-menubar.bash`, `setup-mail.bash` | Re-apply settings (generally safe) |
 | `setup-dock.bash` | **Clears and rebuilds Dock** — use `--include-dock` only when you want that |
 
 Failed `mas` or `brew` installs do not stop the rest of the run (unless you pass `--fail-fast` to `setup.sh`).

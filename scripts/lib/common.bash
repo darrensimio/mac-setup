@@ -320,6 +320,28 @@ mac_setup_mail_play_sounds_status() {
     echo "not_applied"
 }
 
+# True when battery percentage is shown in the menu bar.
+mac_setup_battery_show_percentage_on() {
+    local value
+    if ! value="$(defaults -currentHost read com.apple.controlcenter BatteryShowPercentage 2>/dev/null)"; then
+        return 1
+    fi
+    [[ "$value" == "1" || "$value" == "true" || "$value" == "TRUE" ]]
+}
+
+# Prints: applied | not_applied | unavailable
+mac_setup_battery_show_percentage_status() {
+    if mac_setup_battery_show_percentage_on; then
+        echo "applied"
+        return 0
+    fi
+    if defaults -currentHost read com.apple.controlcenter &>/dev/null; then
+        echo "not_applied"
+        return 0
+    fi
+    echo "unavailable"
+}
+
 mac_setup_mail_apply_sound_prefs() {
     defaults delete -app Mail NewMessagesSoundName 2>/dev/null || true
     defaults write -app Mail NewMessagesSoundName -string "None" 2>/dev/null || true

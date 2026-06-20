@@ -233,6 +233,12 @@ plan_print_os_settings() {
     plan_os_setting_row "os" "Mail: other sounds" "off" "$current" "$status"
     [[ "$status" == "applied" ]] || drift=1
 
+    current="$(defaults -currentHost read com.apple.controlcenter BatteryShowPercentage 2>/dev/null || true)"
+    [[ -n "$current" ]] || current="<unset>"
+    status="$(mac_setup_battery_show_percentage_status)"
+    plan_os_setting_row "os" "Battery: show %" "on" "$current" "$status"
+    [[ "$status" == "applied" ]] || drift=1
+
     echo ""
     return "$drift"
 }
