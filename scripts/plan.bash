@@ -77,6 +77,7 @@ PLAN_APPS=(
     "utils|Hour - World Clock|mas|569089415|Hour.app"
     "utils|Hidden Bar|cask|Hidden Bar.app|"
     "utils|DisplayLink Manager|cask|DisplayLink Manager.app|"
+    "utils|Jabra Direct|cask|Jabra Direct.app|"
     "utils|Stats|cask|Stats.app|"
     "genai|ChatGPT|cask|ChatGPT.app|"
     "genai|Poe|cask|Poe.app|"

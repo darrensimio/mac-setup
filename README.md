@@ -314,7 +314,7 @@ Utilities and peripheral software.
 | Source | Packages |
 |--------|----------|
 | Mac App Store (`mas`) | Moom Classic, Caffeinated (paid), Post-it, Hour - World Clock |
-| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, Stats |
+| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, Jabra Direct, Stats |
 
 Installs `mas` via Homebrew when missing (before App Store installs).
 

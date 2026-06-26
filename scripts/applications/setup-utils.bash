@@ -49,6 +49,8 @@ fi
 
 install_cask_if_missing "DisplayLink Manager.app" displaylink
 
+install_cask_if_missing "Jabra Direct.app" jabra-direct
+
 if ! command -v stats &>/dev/null && [[ ! -d "/Applications/Stats.app" ]]; then
     local brew_out brew_status
     brew_out=$(brew install --cask stats 2>&1) && brew_status=0 || brew_status=$?
