@@ -26,6 +26,7 @@ desired_dock_apps=(
     "/Applications/Microsoft Word.app"
     "/Applications/Microsoft Excel.app"
     "/Applications/Microsoft PowerPoint.app"
+    "/Applications/Jabra Direct.app"
     "/System/Applications/App Store.app"
     "/System/Applications/System Settings.app"
     "/Applications/Proton Pass.app"

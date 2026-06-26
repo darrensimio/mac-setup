@@ -360,7 +360,7 @@ bash scripts/os/setup-mail.bash
 
 Dock and related security settings via `defaults write` (not `dockutil`). **Resets the Dock every time it runs** — use via `setup.sh --include-dock` on a new Mac, or run directly when intentional.
 
-- Clears the dock, then adds: Safari, Google Chrome, Microsoft Edge, ChatGPT, Poe, Spotify, Mail, Proton Mail, Messages, WhatsApp, Telegram, Post-it, Notion, Microsoft Word/Excel/PowerPoint, App Store, System Settings, Proton Pass, 1Password, Windows App, iTerm, Visual Studio Code, Cursor
+- Clears the dock, then adds: Safari, Google Chrome, Microsoft Edge, ChatGPT, Poe, Spotify, Mail, Proton Mail, Messages, WhatsApp, Telegram, Post-it, Notion, Microsoft Word/Excel/PowerPoint, Jabra Direct, App Store, System Settings, Proton Pass, 1Password, Windows App, iTerm, Visual Studio Code, Cursor
 - Dock tile size 24, magnification on (large size 96), Recents hidden
 - Bottom-left and bottom-right hot corners: lock screen
 - Require password immediately after sleep or screen saver
