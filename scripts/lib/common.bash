@@ -114,11 +114,19 @@ mac_setup_print_summary() {
     done <"$MAC_SETUP_REPORT_FILE"
 
     local installed already failed skipped completed
-    installed=$(grep -c $'^installed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
-    already=$(grep -c $'^already\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
-    failed=$(grep -c $'^failed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
-    skipped=$(grep -c $'^skipped\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
-    completed=$(grep -c $'^completed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || echo 0)
+    # Note: `grep -c` prints `0` even when it exits 1 (no matches), so don't `|| echo 0`
+    # or you'll end up with "0\n0" and break arithmetic below.
+    installed="$(grep -c $'^installed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || true)"
+    already="$(grep -c $'^already\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || true)"
+    failed="$(grep -c $'^failed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || true)"
+    skipped="$(grep -c $'^skipped\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || true)"
+    completed="$(grep -c $'^completed\t' "$MAC_SETUP_REPORT_FILE" 2>/dev/null || true)"
+
+    installed="${installed:-0}"
+    already="${already:-0}"
+    failed="${failed:-0}"
+    skipped="${skipped:-0}"
+    completed="${completed:-0}"
 
     echo ""
     echo "Totals: $installed installed, $already already present, $completed completed, $failed failed, $skipped skipped"
@@ -317,6 +325,28 @@ mac_setup_mail_play_sounds_status() {
         echo "applied"
         return 0
     fi
+    echo "not_applied"
+}
+
+# Screenshot preferences (com.apple.screencapture)
+mac_setup_screenshot_location_status() {
+    local desired="$1"
+    local current
+    if ! current="$(defaults read com.apple.screencapture location 2>/dev/null)"; then
+        echo "not_applied"
+        return 0
+    fi
+    [[ "$current" == "$desired" ]] && { echo "applied"; return 0; }
+    echo "not_applied"
+}
+
+mac_setup_screenshot_disable_sound_status() {
+    local current
+    if ! current="$(defaults read com.apple.screencapture disable-sound 2>/dev/null)"; then
+        echo "not_applied"
+        return 0
+    fi
+    [[ "$current" == "1" || "$current" == "true" || "$current" == "TRUE" ]] && { echo "applied"; return 0; }
     echo "not_applied"
 }
 

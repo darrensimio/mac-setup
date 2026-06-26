@@ -297,6 +297,18 @@ plan_print_os_settings() {
     plan_os_setting_row "os" "Battery: show %" "on" "$current" "$status"
     [[ "$status" == "applied" ]] || drift=1
 
+    current="$(defaults read com.apple.screencapture location 2>/dev/null || true)"
+    [[ -n "$current" ]] || current="<unset>"
+    status="$(mac_setup_screenshot_location_status "$HOME/screenshot")"
+    plan_os_setting_row "os" "Screenshots: folder" "~/screenshot" "$current" "$status"
+    [[ "$status" == "applied" ]] || drift=1
+
+    current="$(defaults read com.apple.screencapture disable-sound 2>/dev/null || true)"
+    [[ -n "$current" ]] || current="<unset>"
+    status="$(mac_setup_screenshot_disable_sound_status)"
+    plan_os_setting_row "os" "Screenshots: sound" "off" "$current" "$status"
+    [[ "$status" == "applied" ]] || drift=1
+
     echo ""
     return "$drift"
 }
