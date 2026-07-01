@@ -49,6 +49,9 @@ fi
 
 install_cask_if_missing "DisplayLink Manager.app" displaylink
 
+install_cask_if_missing "OneDrive.app" onedrive
+install_cask_if_missing "Google Drive.app" google-drive
+
 install_cask_if_missing "Jabra Direct.app" jabra-direct
 
 if ! command -v stats &>/dev/null && [[ ! -d "/Applications/Stats.app" ]]; then
