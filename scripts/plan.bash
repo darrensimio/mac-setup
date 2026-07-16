@@ -80,6 +80,7 @@ PLAN_APPS=(
     "utils|OneDrive|cask|OneDrive.app|"
     "utils|Google Drive|cask|Google Drive.app|"
     "utils|Jabra Direct|cask|Jabra Direct.app|"
+    "utils|Logitech Options+|cask|logioptionsplus.app|"
     "utils|Stats|cask|Stats.app|"
     "genai|ChatGPT|cask|ChatGPT.app|"
     "genai|Poe|cask|Poe.app|"

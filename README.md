@@ -314,7 +314,7 @@ Utilities and peripheral software.
 | Source | Packages |
 |--------|----------|
 | Mac App Store (`mas`) | Moom Classic, Caffeinated (paid), Post-it, Hour - World Clock |
-| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, OneDrive, Google Drive, Jabra Direct, Stats |
+| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, OneDrive, Google Drive, Jabra Direct, Logitech Options+, Stats |
 
 Installs `mas` via Homebrew when missing (before App Store installs).
 
@@ -323,6 +323,8 @@ Installs `mas` via Homebrew when missing (before App Store installs).
 **Post-it** uses Mac App Store ID `1475777828` (free; requires macOS 13+).
 
 **Hour - World Clock** uses Mac App Store ID `569089415` (free menu bar world clock; requires macOS 11+).
+
+**Logitech Options+** installs via Homebrew cask `logi-options+` (app path: `/Applications/logioptionsplus.app`). A reboot is recommended after first install for drivers to take effect.
 
 **Optional preference restore** — place files under `scripts/applications/configs/` (see [configs/README.md](scripts/applications/configs/README.md)):
 

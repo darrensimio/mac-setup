@@ -54,6 +54,9 @@ install_cask_if_missing "Google Drive.app" google-drive
 
 install_cask_if_missing "Jabra Direct.app" jabra-direct
 
+# Logitech Options+ (cask installs as logioptionsplus.app; reboot recommended after install)
+install_cask_if_missing "logioptionsplus.app" "logi-options+"
+
 if ! command -v stats &>/dev/null && [[ ! -d "/Applications/Stats.app" ]]; then
     local brew_out brew_status
     brew_out=$(brew install --cask stats 2>&1) && brew_status=0 || brew_status=$?
