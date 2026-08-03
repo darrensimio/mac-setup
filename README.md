@@ -314,7 +314,7 @@ Utilities and peripheral software.
 | Source | Packages |
 |--------|----------|
 | Mac App Store (`mas`) | Moom Classic, Caffeinated (paid), Post-it, Hour - World Clock |
-| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, OneDrive, Google Drive, Jabra Direct, Logitech Options+, Stats |
+| Homebrew cask | Spotify, Hidden Bar, DisplayLink Manager, OneDrive, Google Drive, Jabra Direct, Logitech Options+, RWTS PDFwriter, Stats |
 
 Installs `mas` via Homebrew when missing (before App Store installs).
 
@@ -325,6 +325,8 @@ Installs `mas` via Homebrew when missing (before App Store installs).
 **Hour - World Clock** uses Mac App Store ID `569089415` (free menu bar world clock; requires macOS 11+).
 
 **Logitech Options+** installs via Homebrew cask `logi-options+` (app path: `/Applications/logioptionsplus.app`). A reboot is recommended after first install for drivers to take effect.
+
+**RWTS PDFwriter** installs via Homebrew cask `rwts-pdfwriter` (`.pkg` print driver under `/Library/Printers/RWTS/PDFwriter`). After install, use **PDFWriter Utility** to set a destination folder for printed PDFs.
 
 **Optional preference restore** — place files under `scripts/applications/configs/` (see [configs/README.md](scripts/applications/configs/README.md)):
 

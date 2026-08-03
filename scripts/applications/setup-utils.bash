@@ -57,6 +57,22 @@ install_cask_if_missing "Jabra Direct.app" jabra-direct
 # Logitech Options+ (cask installs as logioptionsplus.app; reboot recommended after install)
 install_cask_if_missing "logioptionsplus.app" "logi-options+"
 
+# RWTS PDFwriter — .pkg printer driver (not an /Applications app)
+if [[ ! -d "/Library/Printers/RWTS/PDFwriter" ]]; then
+    echo "Installing RWTS PDFwriter via Homebrew..."
+    brew_out=$(brew install --cask rwts-pdfwriter 2>&1) && brew_status=0 || brew_status=$?
+    if [[ $brew_status -eq 0 ]]; then
+        mac_setup_report "installed" "RWTS PDFwriter"
+    else
+        echo "$brew_out" >&2
+        mac_setup_record_failure "Homebrew cask: RWTS PDFwriter"
+        mac_setup_report_failed "RWTS PDFwriter" "$brew_out" "brew install --cask rwts-pdfwriter"
+    fi
+else
+    echo "✅ RWTS PDFwriter is already installed. Skipping..."
+    mac_setup_report "already" "RWTS PDFwriter"
+fi
+
 if ! command -v stats &>/dev/null && [[ ! -d "/Applications/Stats.app" ]]; then
     local brew_out brew_status
     brew_out=$(brew install --cask stats 2>&1) && brew_status=0 || brew_status=$?
